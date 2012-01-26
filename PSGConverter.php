@@ -467,7 +467,7 @@ if ($debug == 1){
 
 /* PSGConverter本体　MML→MIDIテキスト */
 function PSGConverter($mml,$ch,$isDrum,$max,$min){
-	$mml = ereg_replace("\r|\n","",$mml);
+	$mml = preg_replace("/\r|\n/","",$mml);
 	// 命令の取得
 	// $mmlを命令単位に分解して格納する
 
