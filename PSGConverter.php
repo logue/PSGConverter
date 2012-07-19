@@ -9,7 +9,7 @@
  :modifider[:name"Logue"; :homepage <http://logue.be/> ];
  :license <http://creativecommons.org/licenses/GPL/2.0/>;
  :dependencies "none";
- :infomation <http://logue.be/Web%E7%B4%A0%E6%9D%90/PSGConverter.php.html>;
+ :infomation <http://mabiassist.logue.be/PSGConverter>;
 */
 
 /* Infomation : 
@@ -378,28 +378,88 @@ function _err($str){
 
 $debug =0;
 
-// 音色番号→$inst
-// default_inst = Piano
-$inst = isset($_GET['i']) ? (int)$_GET['i'] : 1;
-if(($inst<1) || (128<$inst)) $inst=1;
+if (! isset($_GET['m'])) {
+	// 音色番号→$inst
+	$inst   = (isset($_GET['i'])) ? (int)$_GET['i'] : 1;	// 楽器設定
+	$isDrum = (isset($_GET['d'])) ? (int)$_GET['d'] : 0;	// ドラムパートか？
+	$ch     = (isset($_GET['c'])) ? (int)$_GET['c'] : (($isDrum !== 0) ? 10 : 1);		// 使用チャンネル（ドラムだった場合は、10にする）
+	if(($inst<1) || (128<$inst)) $inst=1;	// 楽器の範囲は、1~128
+	// 2.1 Add
+	$Hlimit = (isset($_GET['h'])) ? (int)$_GET['h'] : 88;	// 音階の最高値
+	$Llimit = (isset($_GET['l'])) ? (int)$_GET['l'] : 16;	// 音階の最低値
+}else{
+	// プリセットの楽器番号を使う（0は無効。楽器設定などのパラメータは無視されます。3MLE互換）
+	switch ($_GET['m']){
+		case 1:	// リュート
+			$inst = 24;
+			$Hlimit = 88;
+			$Llimit = 16;
+		break;
+		case 2:	// ウクレレ
+			$inst = 28;
+			$Hlimit = 88;
+			$Llimit = 16;
+		break;
+		case 3:	// マンドリン
+			$inst = 105;
+			$Hlimit = 88;
+			$Llimit = 16;
+		break;
+		case 4:	// ホイッスル
+			$inst = 79;
+			$Hlimit = 88;
+			$Llimit = 60;
+		break;
+		case 5:	// ロンカドーラ
+			$inst = 77;
+			$Hlimit = 83;
+			$Llimit = 48;
+		break;
+		case 6:	// フルート
+			$inst = 73;
+			$Hlimit = 83;
+			$Llimit = 48;
+		break;
+		case 7: // シャリュモー
+			$inst = 111;
+			$Hlimit = 59;
+			$Llimit = 24;
+		break;
+		case 19: // チューバ
+			$inst = 58;
+			$Hlimit = 59;
+			$Llimit = 24;
+		break;
+		case 20:	// リラ
+			$inst = 46;
+		case 66:	// スネア
+			$inst = 48;
+			$isDrum = 38;
+		break;
+		case 67:	// 小太鼓
+			$inst = 48;
+			$isDrum = 40;
+		break;
+		case 68:	// 大太鼓
+			$inst = 48;
+			$isDrum = 36;
+		break;
+		case 78:	// シロフォン
+			$inst = 14;
+		break;
+	}
+}
 
-$ch		= isset($_GET['c']) ? (int)$_GET['c'] : 1;	// 使用チャンネル
-$isDrum	= isset($_GET['d']) ? (int)$_GET['d'] : 0;	// ドラムパートの場合そのノート値を入れる
-$effect	= isset($_GET['e']) ? (int)$_GET['e'] : 40;	// エフェクトの量
-$pan	= isset($_GET['p']) ? (int)$_GET['p'] : 64;	// パンポッド
+$effect = (isset($_GET['e'])) ? (int)$_GET['e'] : 40;	// エフェクトの量
+$pan    = (isset($_GET['p'])) ? (int)$_GET['p'] : 64;	// パンポッド
+
 if(isset($_GET['s'])) { 
-	$mml = rawurldecode($_GET['s']); 
+	$mml = rawurldecode($_GET['s']);
 }else {
-	die('PSGConverter.php v2.1 Usage: PSGConverter.php?i=(instrumental id | default = 1 Piano)&s=(encoded mml data)[&p=(panpot | default=64)&c=(ch | defalut=1)&e=(effect value | default=40)&d=(Dram part note)]');
+	header('Content-Type: text/plain');
+	die("PSGConverter.php v2.0 Usage:\nPSGConverter.php?\n\ti=(instrumental id | default = 1 Piano)\n\t&s=(encoded mml data)\n\t[\n\t\t&p=(panpot | default=64)\n\t\t&c=(ch | defalut=1)\n\t\t&e=(effect value | default=40)\n\t\t&d=(Drum part note)\n\t\t&h=note high limit\n\t\t&l=note low limit\n\t]");
 }
 // 譜面データ→$mml_string[3]
-
-// ドラムパートの処理
-if ($isDrum == 0){
-	$ch = 1;
-}else{
-	$ch = 10;
-}
 
 // 環境設定用初期値の定義
 
@@ -457,7 +517,7 @@ if ($debug == 1){
 // MIDIデータ用クラスをオープン
 }else{
 	$buffer = $midi->getMid();
-	header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 	header('Content-Type: audio/midi');
 	header('Content-Disposition: attachment; filename="PSGConverter.midi"');
 	header('Content-Length: '.strlen($buffer));
@@ -467,7 +527,7 @@ if ($debug == 1){
 
 /* PSGConverter本体　MML→MIDIテキスト */
 function PSGConverter($mml,$ch,$isDrum,$max,$min){
-	$mml = preg_replace("/\r|\n/","",$mml);
+	$mml = preg_replace('/\r|\n/','',$mml);
 	// 命令の取得
 	// $mmlを命令単位に分解して格納する
 
@@ -496,8 +556,8 @@ function PSGConverter($mml,$ch,$isDrum,$max,$min){
 
 	foreach($matches[0] as $mml_note) { // 1命令→メッセージ変換
 		if (preg_match('/([lotvLOTV<>])([1-9][0-9]*|0?)(\.?)(&?)/',$mml_note,$RegExp)){
-			//            $RegExp[1]    $RegExp[2]      $RegExp[3]
-			//            コマンド名    値              オプション（タイや付点など）
+			//            $RegExp[1]    $RegExp[2]   $RegExp[3]
+			//            コマンド名    値           オプション（タイや付点など）
 			// ↑こんな風に代入される。
 
 			$value = (int)$RegExp[2];	//値
