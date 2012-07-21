@@ -20,20 +20,20 @@
 // Based On えむえる
 
 var insts = {
-	'Lute':			{inst: 24,  max: 88, min: 16},
-	'Ukulele':		{inst: 28,  max: 88, min: 16},
-	'Mandorin':		{inst: 105, max: 88, min: 16},
-	'Whistle':		{inst: 78,  max: 88, min: 60},
-	'Flute':		{inst: 73,  max: 83, min: 48},
-	'Roncador':		{inst: 77,  max: 83, min: 48},
-	'Chalumeau':	{inst: 111, max: 59, min: 24},
-	'Tuba':			{inst: 58,  max: 59, min: 24},
-	'Lyre':			{inst: 46,  max: 88, min: 16},
+	'Lute':			{inst: 24,  max: 88, min: 16},	// 25.  Acoustic Guitar (nylon)
+	'Ukulele':		{inst: 28,  max: 88, min: 16},	// 29.  Electric Guitar (muted)
+	'Mandorin':		{inst: 105, max: 88, min: 16},	// 106. Banjo
+	'Whistle':		{inst: 78,  max: 88, min: 60},	// 79.  Whistle
+	'Flute':		{inst: 73,  max: 83, min: 48},	// 74.  Flute
+	'Roncador':		{inst: 77,  max: 83, min: 48},	// 78.  Shakuhachi
+	'Chalumeau':	{inst: 71,  max: 59, min: 24},	// 72.  Clarinet
+	'Tuba':			{inst: 58,  max: 59, min: 24},	// 59.  Tuba
+	'Lyre':			{inst: 46,  max: 88, min: 16},	// 47.  Orchestral Harp
 	'Snere':		{inst: 48,  max: 38, min: 38},
 	'Drum':			{inst: 48,  max: 40, min: 40},
 	'Bass Drum':	{inst: 48,  max: 36, min: 36},
 	'Cymbal':		{inst: 48,  max: 49, min: 49},
-	'Xylophone':	{inst: 14,  max: 88, min: 16}
+	'Xylophone':	{inst: 14,  max: 88, min: 16}	// 14.  Xylophone
 };
 
 (function($){	
@@ -76,7 +76,7 @@ var insts = {
 			var cVolume = 8;
 			var cNote = 0;			// "&"記号処理用
 			var tieEnabled = 0; // "&"記号処理用
-			var time = Semibreve;		// 先頭を１小節あける。
+			var time = Semibreve;		// 先頭を１小節あける。（ノイズがでるため）
 
 			var part_msgs = [];
 			
