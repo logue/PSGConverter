@@ -25,11 +25,11 @@ var insts = {
 	'Mandorin':		{inst: 105, max: 88, min: 16},	// 106. Banjo
 	'Whistle':		{inst: 78,  max: 88, min: 60},	// 79.  Whistle
 	'Flute':		{inst: 73,  max: 83, min: 48},	// 74.  Flute
-	'Roncador':		{inst: 77,  max: 83, min: 48},	// 78.  Shakuhachi
+	'Roncadora':	{inst: 77,  max: 83, min: 48},	// 78.  Shakuhachi
 	'Chalumeau':	{inst: 71,  max: 59, min: 24},	// 72.  Clarinet
 	'Tuba':			{inst: 58,  max: 59, min: 24},	// 59.  Tuba
 	'Lyre':			{inst: 46,  max: 88, min: 16},	// 47.  Orchestral Harp
-	'Snere':		{inst: 48,  max: 38, min: 38},
+	'Snare':		{inst: 48,  max: 38, min: 38},	// Drum Part
 	'Drum':			{inst: 48,  max: 40, min: 40},
 	'Bass Drum':	{inst: 48,  max: 36, min: 36},
 	'Cymbal':		{inst: 48,  max: 49, min: 49},
