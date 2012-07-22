@@ -37,6 +37,25 @@ var insts = {
 };
 
 (function($){	
+	
+	var dLength = 96;	// = 1quarternote = 32tick
+	var Semibreve = dLength*4;	// 1小節
+	var Minim = dLength*2;		// １拍（Tick連動）
+
+	
+	var TRACK_START = String.fromCharCode(
+		0x4d, 0x54, 0x72, 0x6b
+	);
+	var TRACK_END   = String.fromCharCode(
+		0xFF, 0x2F
+	);
+
+	var NOTE_TABLE = {'c':0,'d':2,'e':4,'f':5,'g':7,'a':9,'b':11};
+
+	var GM_RESET = String.fromCharCode(
+		0xF0, 0x7E, 0x7F, 0x09, 0x01, 0xF7	// GM Reset F0 7E 7F 09 01 F7
+	);
+	
 	// 楽器セレクタ
 	function inst_selecteor(selected_inst){
 		var html = '<select class="inst" style="width:100px;">';
@@ -46,198 +65,222 @@ var insts = {
 		html += '</select>'
 		return html;
 	}
+	/*
+	function genMasterTrack(){
+		var part_msgs = [
+			{'time' : 0, 'msg' : String.fromCharCode(0xF0)+mml_getBytes(GM_RESET) + GM_RESET + String.fromCharCode(0xF7) },
+			{'time' : 96, 'msg' : String.fromCharCode(0xff,0x51, 0x07, 0xa1, 0x20)},	// テンポ設定（デフォルト60000000/120 = 500000）
+			{'time' : 368 , 'msg' : String.fromCharCode(0xff , 0x2f, 0x00)}	// Meta TrkEnd
+		];
+		var track_data = '';
+		var last_time;
+		for(var mmid = 0; mmid < part_msgs.length; mmid++) {
+			var dt = part_msgs[mmid].time - last_time;
+			last_time = part_msgs[mmid].time;
+			track_data += mml_writeVarLen(dt) + part_msgs[mmid].msg;
+		}
+		var ret = 
+			TRACK_START +	// MTrk
+			mml_getBytes(track_data.length,4) +	// Block Length
+			track_data +						// Midi data
+			TRACK_END;		// Trk End
+		;
+		return ret;
+	}
+	*/
+	function genTrack(mml, chid, inst, pan, effect, Min, Max){
+		var isDrum = (Min == Max) ? true : false;
+		var cLength = dLength;
+		var cOctave = 4;
+		var cVolume = 8;
+		var cNote = 0;				// "&"記号処理用
+		var tieEnabled = false; 	// "&"記号処理用
+		var time = Semibreve;		// 先頭を１小節あける。（ノイズがでるため）
+		var isDrum = false;
+		if (Min == Max){
+			chid = 9;
+			isDrum = true;
+		}
+		
+		var part_msgs = [
+			{'time' : 96,	'msg' : String.fromCharCode(0xc0 + chid, inst)},	// PrCh 楽器変更
+			{'time' : 192,	'msg' : String.fromCharCode(0xb0 + chid, 10, pan)},		// パンポット
+			{'time' : 288,	'msg' : String.fromCharCode(0xb0 + chid, 91, effect)}	// エフェクト
+		];
+
+		var notes = mml.match(/[a-glnortvA-GLNORTV<>][\+\#-]?[0-9]*\.?&?/g);
+
+		for(var mnid=0; mnid < notes.length; mnid++) {
+			if(notes[mnid].match(/([lotvLOTV<>])([1-9][0-9]*|0?)(\.?)(&?)/)) {
+				if(tieEnabled == 1 && RegExp.$4 != '&') {
+					tieEnabled = 0;
+					part_msgs.push({'time':time,'msg':String.fromCharCode(0x80+chid,cNote,Minim)});
+				}
+				switch(RegExp.$1){
+					case 'L':
+					case 'l':
+						// 音長設定 Ln[.] (n=1～192)
+						if(RegExp.$2 >= 1 && RegExp.$2 <= Minim) {
+							cLength = Math.floor(Semibreve/RegExp.$2);
+							if(RegExp.$3 == '.') {
+								cLength = Math.floor(cLength*1.5);
+							}
+						}
+						break;
+					case 'O':
+					case 'o':
+						// オクターブ設定 On (n=1～8)
+						if(RegExp.$2 >= 1 && RegExp.$2 <= 8) {
+							cOctave = parseInt(RegExp.$2);
+						}
+						break;
+					case 'T':
+					case 't':
+						// テンポ設定 Tn (n=32～255)
+						if(RegExp.$2 >= 32 && RegExp.$2 <= 255) {
+							part_msgs.push({'time':time, 'msg':String.fromCharCode(0xff,0x51,0x03)+mml_getBytes(Math.floor(60000000/RegExp.$2),3)});
+						}
+						break;
+					case 'V':
+					case 'v':
+						//ボリューム調整
+						if(RegExp.$2 != '' && RegExp.$2 >= 0 && RegExp.$2 <= 15) {
+							cVolume = parseInt(RegExp.$2);
+						}
+						break;
+					
+					// 簡易オクターブ設定 {<>}
+					case '<':
+						cOctave = (cOctave<=1)? 1: (cOctave-1);
+						break;
+					case '>':
+						cOctave = (cOctave>=8)? 8: (cOctave+1);
+						break;
+				}
+			}
+			
+			if( notes[mnid].match(/([a-gnA-GN])([\+\#-]?)([0-9]*)(\.?)(&?)/) ) {
+				var tick = cLength;
+				var val = RegExp.$3;
+				switch (RegExp.$1){
+					case 'n': case 'N':
+						// Nn, [A-G]数字なし -> Lで指定した長さに設定
+						if((12<=val) && (val<=95)) note=val;
+					break;
+					default:
+						// [A-G] 音名表記
+						// 音符の長さ指定: n分音符→128分音符×tick数
+						if(1<=val && val<=Minim) tick=Math.floor(Semibreve / val);	// L1 -> 384tick .. L64 -> 6tick
+						if(RegExp.$4==".") tick=Math.floor(tick*1.5); // 付点つき -> 1.5倍
+
+						if (!isDrum){
+							// 音名→音階番号変換(C1 -> 12, C4 -> 48, ..)
+							var note = 12*cOctave + NOTE_TABLE[RegExp.$1.toLowerCase()];
+
+							// 調音記号の処理
+							switch(RegExp.$2){
+								case '+':
+								case '#':
+									note++;
+								break;
+								case '-':
+									note--;
+								break;
+							}
+						}
+					break;
+				}
+				
+				if (!isDrum){
+					// オクターブ調整（楽器の音域エミュレーション）
+					while (note < Min) note = note+12;
+					while (note > Max) note = note-12;
+					note += 12; // 1オクターブ低く演奏される不具合を修正 060426
+				}else{
+					// ドラムパートの場合ノートを強制的に指定
+					note = isDrum;
+				}
+
+				// c&dなど無効なタイの処理
+				if(tieEnabled == true && note != cNote) {
+					tieEnabled=false;
+					part_msgs.push({'time':time,'msg':String.fromCharCode(0x80+chid,cNote,Minim)});	// NoteOff
+				}
+
+				// 前回タイ記号が無いときのみノートオン
+				if(tieEnabled == false) 
+					part_msgs.push({'time':time,'msg':String.fromCharCode(0x90+chid,note,8*cVolume)});	// NoteOn
+
+				time += tick;				// タイムカウンタを音符の長さだけ進める
+
+				// ノートオフ命令の追加
+				if(RegExp.$5=='&') {	// タイ記号の処理
+					tieEnabled=true; 
+					cNote=note; // 直前の音階を保存
+				} else {
+					tieEnabled=false;
+					part_msgs.push({'time':time,'msg':String.fromCharCode(0x80+chid,note,Minim)});	// NoteOff
+				}
+			}else if(tieEnabled == true) {	// 無効なタイの処理
+				tieEnabled = false;
+				part_msgs.push({'time':time,'msg':String.fromCharCode(0x80+chid,cNote,Minim)});	// NoteOff
+			}
+			
+			// 休符設定 R[n][.] (n=1～64)
+			if(notes[mnid].match(/[rR]([0-9]*)(\.?)/)) {
+				tick=cLength; // 数字なし -> Lで指定した長さに設定
+				var len = RegExp.$1;
+				if(1<=len && len<=Minim) tick=Math.floor(Semibreve/len);	// L1 -> 128tick .. L64 -> 2tick
+				if(RegExp.$2==".") tick=Math.floor(tick*1.5);	// 付点つき -> 1.5倍
+				time += tick;									// タイムカウンタを休符の長さだけ進める
+			}
+		}
+		part_msgs.push({time:time+Minim , 'msg' : String.fromCharCode(0xff , 0x2f, 0x00)});	// Meta TrkEnd
+//		part_msgs.sort(function(a, b) {return a["time"] < b["time"] ? 1 : -1;});
+		var track_data = '';
+		var last_time;
+		for(var mmid = 0; mmid < part_msgs.length; mmid++) {
+			var dt = part_msgs[mmid].time - last_time;
+			last_time = part_msgs[mmid].time;
+			track_data += mml_writeVarLen(dt) + part_msgs[mmid].msg;
+		}
+		
+		var ret = 
+			TRACK_START +	// MTrk
+			mml_getBytes(track_data.length,4) +// Block Length
+			track_data 							// Midi data
+			TRACK_END;		// Trk End
+		;
+		return ret;
+	}
 
 	// MML>MIDI変換コアルーチン
 	function mabimml_genmidi(param) {
 		// param.inst midi楽器番号(0-127)
 		// param.mml mml文字列の配列
-		var dLength = 96;	// = 1quarternote = 32tick
-		var Semibreve = dLength*4;	// 1小節
-		var Minim = dLength*2;		// １拍（Tick連動）
+		var nMin = 16, nMax = 88;
 
-		var nMin = 16, nMax = 88, isDrum = false;
-		
 		if (param.min || param.max){
 			nMin = param.min;
 			nMax = param.max;
 		}
+		var inst = (param.inst && param.inst >= 0 && param.inst < 128) ? Math.round(param.inst) : 0;
+		var pan = (param.pan && param.pan >= 0 && param.pan < 128) ? Math.round(param.pan) : 64;
+		var effect = (param.effect && param.effect >= 0 && param.effect < 128) ? Math.round(param.effect) : 40;
 
-		var chid = isDrum ? 10 : 1;
-		var inst = (param.inst >= 0 && param.inst < 128)? Math.round(param.inst): 0;
-		var midi_msgs = [
-		//	{'time':0,		'msg':String.fromCharCode(0xf0, 0x06, 0xF0, 0x7E, 0x7F, 0x09, 0x01, 0xF7, 0x8f, 0x00)},	// GM Reset F0 7E 7F 09 01 F7
-			{'time':Minim,	'msg':String.fromCharCode(0xc0 + chid, inst)}	// 楽器変更
-		];
-		var noteTable = {'c':0,'d':2,'e':4,'f':5,'g':7,'a':9,'b':11};
-
-		for(var partid = 0; partid < param.mml.length; partid++) {	// パートごとに処理
-			var cLength = dLength;
-			var cOctave = 4;
-			var cVolume = 8;
-			var cNote = 0;			// "&"記号処理用
-			var tieEnabled = 0; // "&"記号処理用
-			var time = Semibreve;		// 先頭を１小節あける。（ノイズがでるため）
-
-			var part_msgs = [];
-			
-			var mml_notes = param.mml[partid].match(/[a-glnortvA-GLNORTV<>][\+\#-]?[0-9]*\.?&?/g);
-			if (mml_notes == null) { continue; }
-			for(var mnid=0; mnid < mml_notes.length; mnid++) {
-				var mml_note = mml_notes[mnid];
-				if(mml_note.match(/([lotvLOTV<>])([1-9][0-9]*|0?)(\.?)(&?)/)) {
-
-					if(tieEnabled == 1 && RegExp.$4 != '&') {
-						tieEnabled = 0;
-						part_msgs.push({'time':time,'msg':String.fromCharCode(0x80+chid,cNote,Minim)});
-					}
-					switch(RegExp.$1){
-						case 'L':
-						case 'l':
-							// 音長設定 Ln[.] (n=1～192)
-							if(RegExp.$2 >= 1 && RegExp.$2 <= Minim) {
-								cLength = Math.floor(Semibreve/RegExp.$2);
-								if(RegExp.$3 == '.') {
-									cLength = Math.floor(cLength*1.5);
-								}
-							}
-							break;
-						case 'O':
-						case 'o':
-							// オクターブ設定 On (n=1～8)
-							if(RegExp.$2 >= 1 && RegExp.$2 <= 8) {
-								cOctave = parseInt(RegExp.$2);
-							}
-							break;
-						case 'T':
-						case 't':
-							// テンポ設定 Tn (n=32～255)
-							if(RegExp.$2 >= 32 && RegExp.$2 <= 255) {
-								part_msgs.push({'time':time, 'msg':String.fromCharCode(0xff,0x51,0x03)+mml_getBytes(Math.floor(60000000/RegExp.$2),3)});
-							}
-							break;
-						case 'V':
-						case 'v':
-							//ボリューム調整
-							if(RegExp.$2 != '' && RegExp.$2 >= 0 && RegExp.$2 <= 15) {
-								cVolume = parseInt(RegExp.$2);
-							}
-							break;
-						
-						// 簡易オクターブ設定 {<>}
-						case '<':
-							cOctave = (cOctave<=1)? 1: (cOctave-1);
-							break;
-						case '>':
-							cOctave = (cOctave>=8)? 8: (cOctave+1);
-							break;
-					}
-				}
-				
-				if( mml_note.match(/([a-gnA-GN])([\+\#-]?)([0-9]*)(\.?)(&?)/) ) {
-					var tick = cLength;
-					var val = RegExp.$3;
-					switch (RegExp.$1){
-						case 'n': case 'N':
-							// Nn, [A-G]数字なし -> Lで指定した長さに設定
-							if((12<=val) && (val<=95)) note=val;
-						break;
-						default:
-							// [A-G] 音名表記
-							// 音符の長さ指定: n分音符→128分音符×tick数
-							if(1<=val && val<=Minim) tick=Math.floor(Semibreve / val);	// L1 -> 384tick .. L64 -> 6tick
-							if(RegExp.$4==".") tick=Math.floor(tick*1.5); // 付点つき -> 1.5倍
-
-							if (!isDrum){
-								// 音名→音階番号変換(C1 -> 12, C4 -> 48, ..)
-								var note = 12*cOctave + noteTable[RegExp.$1.toLowerCase()];
-
-								// 調音記号の処理
-								switch(RegExp.$2){
-									case '+':
-									case '#':
-										note++;
-									break;
-									case '-':
-										note--;
-									break;
-								}
-							}
-						break;
-					}
-					
-					if (!isDrum){
-						// オクターブ調整（楽器の音域エミュレーション）
-						while (note < nMin) note = note+12;
-						while (note > nMax) note = note-12;
-						note += 12; // 1オクターブ低く演奏される不具合を修正 060426
-					}else{
-						// ドラムパートの場合ノートを強制的に指定
-						note = isDrum;
-					}
-
-					// c&dなど無効なタイの処理
-					if(tieEnabled == true && note != cNote) {
-						tieEnabled=false;
-						part_msgs.push({'time':time,'msg':String.fromCharCode(0x80+chid,cNote,Minim)});	// NoteOff
-					}
-
-					// 前回タイ記号が無いときのみノートオン
-					if(tieEnabled == false) 
-						part_msgs.push({'time':time,'msg':String.fromCharCode(0x90+chid,note,8*cVolume)});	// NoteOn
-
-					time += tick;				// タイムカウンタを音符の長さだけ進める
-
-					// ノートオフ命令の追加
-					if(RegExp.$5=='&') {	// タイ記号の処理
-						tieEnabled=true; 
-						cNote=note; // 直前の音階を保存
-					} else {
-						tieEnabled=false;
-						part_msgs.push({'time':time,'msg':String.fromCharCode(0x80+chid,note,Minim)});	// NoteOff
-					}
-				}else if(tieEnabled == 1) {	// 無効なタイの処理
-					tieEnabled = false;
-					part_msgs.push({'time':time,'msg':String.fromCharCode(0x80+chid,cNote,Minim)});	// NoteOff
-				}
-				
-				// 休符設定 R[n][.] (n=1～64)
-				if(mml_note.match(/[rR]([0-9]*)(\.?)/)) {
-					tick=cLength; // 数字なし -> Lで指定した長さに設定
-					var len = RegExp.$1;
-					if(1<=len && len<=Minim) tick=Math.floor(Semibreve/len);	// L1 -> 128tick .. L64 -> 2tick
-					if(RegExp.$2==".") tick=Math.floor(tick*1.5);	// 付点つき -> 1.5倍
-					time += tick;									// タイムカウンタを休符の長さだけ進める
-				}
-			}
-			
-			// マージ
-			var merge_msgs = [];
-			while(midi_msgs.length > 0 || part_msgs.length > 0) {
-				if(part_msgs.length == 0 || midi_msgs.length > 0 && (midi_msgs[0].time <= part_msgs[0].time)) {
-					merge_msgs.push(midi_msgs.shift());
-				} else {
-					merge_msgs.push(part_msgs.shift());
-				}
-			}
-			midi_msgs = merge_msgs;
+		var ret = String.fromCharCode(
+			0x4D, 0x54, 0x68, 0x64,		// chunk ID "MThd"
+			0x00, 0x00, 0x00, 0x06,		// chunk size
+			0x01, 0x00,					// format type (Midi format1)
+			0x00, param.mml.length,		// number of tracks
+			0x00, dLength				// ticks per beat
+		);
+		// Master Track
+		//ret += genMasterTrack();
+		for(var part = 0; part < param.mml.length; part++) {	// パートごとに処理
+			ret += genTrack(param.mml[part], part, inst, pan, effect, nMin, nMax);
 		}
-		var midi_track = '';
-		var last_time = 0;
-		for(var mmid = 0; mmid < midi_msgs.length; mmid++) {
-			var dt = midi_msgs[mmid].time - last_time;
-			last_time = midi_msgs[mmid].time;
-			midi_track += mml_writeVarLen(dt) + midi_msgs[mmid].msg;
-		}
-		midi_track += mml_writeVarLen(dLength);	// 末尾に四分音符
-		midi_track += String.fromCharCode(0xff,0x2f,0x00); // TrkEnd;
-
 		// dataを返す
-		var ret =
-			'MThd' + 
-				String.fromCharCode(0,0,0,6,0,0,0,1,0,dLength) +
-			'MTrk' + 
-				mml_getBytes(midi_track.length,4) + 
-				midi_track;
 		return ret;
 	}
 
@@ -276,9 +319,9 @@ var insts = {
 	// http://tociyuki.cool.ne.jp/archive/base64.html
 
 	function base64encode(s){
-//		if (window.btoa){
-//			return btoa(s);
-//		}else{
+		if (window.btoa){
+			return btoa(s);
+		}else{
 			var base64list = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 			var t = '', p = -6, a = 0, i = 0, v = 0, c;
 			while ( (i < s.length) || (p > -6) ) {
@@ -297,7 +340,7 @@ var insts = {
 				v -= 6;
 			}
 			return t;
-//		}
+		}
 	}
 	
 	function mml_player(param, autoplay, debug){
@@ -325,7 +368,8 @@ var insts = {
 			var self = this;
 			var $this = $(this);
 			var data = $this.data();
-			var debug = data.debug;
+			//var debug = data.debug;
+			var debug = true;
 			var param = {};
 			
 			if (data.instName !== '' && insts[data.instName] ){
@@ -346,7 +390,9 @@ var insts = {
 					}
 				}
 			}
-			console.log(param);
+			
+			if (data.pan !== '') param.pan = data.pan;
+			if (data.effect !== '') param.effect = data.effect;
 			param.mml = mml_sanitize($this.contents()[0].nodeValue);	// MML配列
 
 			$this.before(mml_player(param,false, debug));
