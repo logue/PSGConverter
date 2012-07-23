@@ -17,7 +17,7 @@ body {
 /*]]>*/</style>
 		<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
 		<link href="css/custom-theme/jquery-ui-1.8.16.custom.css" rel="stylesheet">
-		<link href="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.css" rel="stylesheet">
+		<link href="js/google-code-prettify/prettify.css" rel="stylesheet">
 
 		<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
 		<!--[if lt IE 9]>
@@ -64,14 +64,15 @@ body {
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#basic" data-toggle="tab">Basic Usage</a></li>
 					<li><a href="#option" data-toggle="tab">Option</a></li>
+					<li><a href="#instrument" data-toggle="tab">Instrument</a></li>
 					<li><a href="#example" data-toggle="tab">Example</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="basic">
 						Insert the MML in the pre tag mabimml to put a class attribute.
-						<pre class="prettyprint linenums">&lt;pre&nbsp;class=&quot;mabimml&quot;&nbsp;title=&quot;MML Name&quot;&nbsp;data-inst=&quot;105&quot;&gt; ... Insert valied Mabinogi MML ... &lt;/pre&gt;</pre>
+						<pre class="prettyprint">&lt;pre&nbsp;class=&quot;mabimml&quot;&nbsp;title=&quot;MML Name&quot;&nbsp;data-inst=&quot;105&quot;&gt; ... Insert valied Mabinogi MML ... &lt;/pre&gt;</pre>
 						Please insert the following script at the bottom of the page.
-						<pre class="prettyprint linenums">
+						<pre class="prettyprint">
 &lt;script&nbsp;type=&quot;text/javascript&quot;&nbsp;src=&quot;http://code.jquery.com/jquery.min.js&quot;&gt;&lt;/script&gt;
 &lt;script&nbsp;type=&quot;text/javascript&quot;&nbsp;src=&quot;./PSGConverter.js&quot;&gt;&lt;/script&gt;</pre>
 					</div>
@@ -90,7 +91,7 @@ body {
 								</tr>
 								<tr>
 									<td><code>data-inst-name</code></td>
-									<td>Specify the name of the Mabinogi instrument. e.g. Lute</td>
+									<td>Specify the name of the Mabinogi instrument. e.g. Lute. see <a href="#instrument">Instrument Tab</a></td>
 								</tr>
 								<tr>
 									<td><code>data-pan</code></td>
@@ -103,11 +104,109 @@ body {
 							</tbody>
 						</table>
 					</div>
+					<div class="tab-pane" id="instrument">
+						<table class="table">
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>GM Instrument</th>
+									<th>Max Scale</th>
+									<th>Min Scale</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Lute</td>
+									<td>25. Acoustic Guitar (nylon)</td>
+									<td>88</td>
+									<td>16</td>
+								</tr>
+								<tr>
+									<td>Ukulele</td>
+									<td>29. Electric Guitar (muted)</td>
+									<td>88</td>
+									<td>16</td>
+								</tr>
+								<tr>
+									<td>Mandorin</td>
+									<td>106. Banjo</td>
+									<td>88</td>
+									<td>16</td>
+								</tr>
+								<tr>
+									<td>Whistle</td>
+									<td>79. Whistle</td>
+									<td>88</td>
+									<td>60</td>
+								</tr>
+								<tr>
+									<td>Flute</td>
+									<td>74. Flute</td>
+									<td>83</td>
+									<td>48</td>
+								</tr>
+								<tr>
+									<td>Roncadora</td>
+									<td>78. Shakuhachi</td>
+									<td>83</td>
+									<td>48</td>
+								</tr>
+								<tr>
+									<td>Chalumeau</td>
+									<td>72. Clarinet</td>
+									<td>59</td>
+									<td>24</td>
+								</tr>
+								<tr>
+									<td>Tuba</td>
+									<td>59. Tuba</td>
+									<td>59</td>
+									<td>24</td>
+								</tr>
+								<tr>
+									<td>Lyre</td>
+									<td>47. Orchestral Harp</td>
+									<td>88</td>
+									<td>16</td>
+								</tr>
+								<tr>
+									<td>Snare</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>Drum</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>Bass Drum</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>Cymbal</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>Xylophone</td>
+									<td>14. Xylophone</td>
+									<td>88</td>
+									<td>16</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<div class="tab-pane" id="example">
 						<div class="row">
 							<div class="span6">
 								Music from Lemmings.
-								<pre class="prettyprint linenums">&lt;pre&nbsp;class=&quot;mabimml&quot;&nbsp;title=&quot;Tim2&quot;&nbsp;data-inst-name=&quot;Lute&quot;&gt;MML@
+								<pre class="prettyprint">&lt;pre&nbsp;class=&quot;mabimml&quot;&nbsp;title=&quot;Tim2&quot;&nbsp;data-inst-name=&quot;Lute&quot;&gt;MML@
 l64e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;ev0e2t124v15l16eegeeegeeeaagad2l8r&gt;cc&lt;agl16ggeag8efggeag8fed4.r8&gt;e8e8dc&lt;agt124eegeeegeeeaagad2l8r&gt;cc&lt;agl16ggeag8efggeag8fed4.r8&gt;e8e8dc&lt;agl8fgagb+bfg4gfgfedc4.r4ggabggabb+bagfgagb+bfg4gfgfedc4.r4ggabggabb+bagr4&gt;eeedc&lt;b4gged4efo2cr&gt;cro6cc&lt;ag4&lt;gggb+4b&gt;c2&amp;cl16gag8gag4l8&lt;ddef4edc1&lt;g1,
 r1v15l8o2cr&gt;cr&lt;frag4gagagab+cr&gt;cr&lt;frag4gagagab+cr&gt;cr&lt;frag4gagagab+cr&gt;cr&lt;frag4gagagab+fffeff+ff+gggggabrfffefeff+gggggfedfffefeff+gggggabrfffefeff+gggggfedcr&gt;cr&lt;frag4gagaga&gt;cr2&lt;frag4r1r4.l16o4gag8gag4,
 l1.rrrrrrv15&lt;f2l4.ag1c8a2b+g1r8f2ag1c8a2&gt;cl1dr8erel8ro2gagagab+cr&gt;cr&lt;frag4gagagab+cr&gt;cr&lt;frag4gagagfe
@@ -199,13 +298,18 @@ r1v15l1.fgee2.c2.c&lt;bbl2.er&lt;fl4fg&gt;fa&lt;ga2&gt;g2rb+b&lt;gf2.fg&gt;fa&lt
 		<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
 		<script type="text/javascript" src="http://code.jquery.com/ui/1.8.21/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js"></script>
+		<script type="text/javascript" src="js/google-code-prettify/prettify.js"></script>
 		<script type="text/javascript" src="https://github.com/logue/PSGConverter/raw/master/PSGConverter.js"></script>
 		<script type="text/javascript">/*<![CDATA[*/
 $(document).ready(function(){
 	// make code pretty
-	window.prettyPrint && prettyPrint()
-
+	window.prettyPrint && prettyPrint();
+	
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-33600926-1']);
+	_gaq.push(['_trackPageview']);
+	$.getScript(('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js');
 });
+/*]]>*/</script>
 	</body>
 </html>
