@@ -16,7 +16,6 @@ body {
 }
 /*]]>*/</style>
 		<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
-		<link href="css/custom-theme/jquery-ui-1.8.16.custom.css" rel="stylesheet">
 		<link href="js/google-code-prettify/prettify.css" rel="stylesheet">
 
 		<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -38,10 +37,20 @@ body {
 					<h1><a class="brand" href="#">PSGConverter</a></h1>
 					<div class="nav-collapse">
 						<ul class="nav">
-							<li class="active"><a href="#">Home</a></li>
-							<li><a href="#about">About</a></li>
-							<li><a href="#usage">Usage</a></li>
-							<li><a href="#demo">Demo</a></li>
+							<li><a href="http://mabiassist.logue.be/PSGConverter">Official Page</a></li>
+							<li><a href="http://forum.logue.be/index.php?topic=531.0">Support Forum</a></li>
+							<li class="dropdown active">
+								<a class="dropdown-toggle" data-toggle="dropdown" href="#">GitHub Page</a>
+								<ul class="dropdown-menu">
+									<li><a href="https://github.com/logue/PSGConverter">Project Page</a></li>
+									<li><a href="https://github.com/logue/PSGConverter/network">Network</a></li>
+									<li><a href="https://github.com/logue/PSGConverter/pulls">Pull Requests</a></li>
+									<li><a href="https://github.com/logue/PSGConverter/issues">Issues</a></li>
+									<li><a href="https://github.com/logue/PSGConverter/graphs">Graphs</a></li>
+									<li><a href="https://github.com/logue/PSGConverter/downloads">Downloads</a></li>
+								</ul>
+							</li>
+							<li><a href="composer.html">Web Composer</a></li>
 						</ul>
 					</div><!--/.nav-collapse -->
 				</div>
@@ -54,6 +63,7 @@ body {
 				<p class="lead">PSGConverter is converter of Mabinogi MML to MIDI file script. This version is implemented by Javascript.</p>
 				<p>
 					<a href="http://mabiassist.logue.be/PSGConverter" class="btn btn-large btn-info">Official Site</a>
+					<a href="http://forum.logue.be/index.php?topic=531.0" class="btn btn-large">Support Forum</a>
 					<a href="https://github.com/logue/PSGConverter" class="btn btn-large">Project Site</a>
 					<a href="https://github.com/logue/PSGConverter/downloads" class="btn btn-primary btn-large">Download</a>
 				</p>
@@ -62,13 +72,13 @@ body {
 				<h2>Usage</h2>
 				
 				<ul class="nav nav-tabs">
-					<li class="active"><a href="#basic" data-toggle="tab">Basic Usage</a></li>
+					<li class="active"><a href="#install" data-toggle="tab">Install</a></li>
 					<li><a href="#option" data-toggle="tab">Option</a></li>
 					<li><a href="#instrument" data-toggle="tab">Instrument</a></li>
 					<li><a href="#example" data-toggle="tab">Example</a></li>
 				</ul>
 				<div class="tab-content">
-					<div class="tab-pane active" id="basic">
+					<div class="tab-pane active" id="install">
 						Insert the MML in the pre tag mabimml to put a class attribute.
 						<pre class="prettyprint">&lt;pre&nbsp;class=&quot;mabimml&quot;&nbsp;title=&quot;MML Name&quot;&nbsp;data-inst=&quot;105&quot;&gt; ... Insert valied Mabinogi MML ... &lt;/pre&gt;</pre>
 						Please insert the following script at the bottom of the page.
@@ -105,11 +115,12 @@ body {
 						</table>
 					</div>
 					<div class="tab-pane" id="instrument">
+						<p>Sound will appear in the instrument and the scale that is specified in the following <code>data-inst-name</code> and to put a name.</p>
 						<table class="table">
 							<thead>
 								<tr>
 									<th>Name</th>
-									<th>GM Instrument</th>
+									<th>GM Instrument Mapping</th>
 									<th>Max Scale</th>
 									<th>Min Scale</th>
 								</tr>
@@ -296,7 +307,6 @@ r1v15l1.fgee2.c2.c&lt;bbl2.er&lt;fl4fg&gt;fa&lt;ga2&gt;g2rb+b&lt;gf2.fg&gt;fa&lt
 		================================================== -->
 		<!-- Placed at the end of the document so the pages load faster -->
 		<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
-		<script type="text/javascript" src="http://code.jquery.com/ui/1.8.21/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="js/google-code-prettify/prettify.js"></script>
 		<script type="text/javascript" src="https://github.com/logue/PSGConverter/raw/master/PSGConverter.js"></script>
@@ -304,11 +314,23 @@ r1v15l1.fgee2.c2.c&lt;bbl2.er&lt;fl4fg&gt;fa&lt;ga2&gt;g2rb+b&lt;gf2.fg&gt;fa&lt
 $(document).ready(function(){
 	// make code pretty
 	window.prettyPrint && prettyPrint();
-	
-	var _gaq = _gaq || [];
-	_gaq.push(['_setAccount', 'UA-33600926-1']);
-	_gaq.push(['_trackPageview']);
-	$.getScript(('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js');
+
+	$.getScript(('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js',function(){
+		try {
+			var pageTracker = _gat._getTracker("UA-33600926-1");
+			pageTracker._trackPageview();
+		} catch(err) {}
+		/*
+		$('a').each(function(){
+			var href = $(this).attr('href');
+			if ((href.match(/^https?\:/i)) && (!href.match(document.domain))){
+				$(this).click(function() {
+					var extLink = href.replace(/^https?\:\/\//i, '');
+					pageTracker._trackEvent('External', 'Click', extLink);
+				});
+			}
+		});*/
+	});
 });
 /*]]>*/</script>
 	</body>
