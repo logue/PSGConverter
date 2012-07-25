@@ -1,0 +1,90 @@
+#composer-keyboard div{
+	z-index:999;
+	width:263px;
+	height:123px;
+	position:relative;
+	background:url(../img/keyboard.png) no-repeat left top;
+}
+
+#composer-keyboard a{
+	display:block;
+	cursor:pointer;
+	position:absolute;
+	/*text-indent: -999em;*/
+}
+
+#c {width:33px;height:108px;top:4px;left:2px ; z-index:1000;}
+#cs{width:24px;height:71px; top:0px;left:25px; z-index:1007;}
+#d {width:33px;height:108px;top:4px;left:39px; z-index:1001;}
+#ds{width:24px;height:71px; top:0px;left:63px; z-index:1008;}
+#e {width:33px;height:108px;top:4px;left:77px; z-index:1002;}
+#f {width:33px;height:108px;top:4px;left:114px;z-index:1003;}
+#fs{width:24px;height:71px; top:0px;left:138px;z-index:1009;}
+#g {width:33px;height:108px;top:4px;left:151px;z-index:1004;}
+#gs{width:24px;height:71px; top:0px;left:175px;z-index:1010;}
+#a {width:33px;height:108px;top:4px;left:189px;z-index:1005;}
+#as{width:24px;height:71px; top:0px;left:213px;z-index:1011;}
+#b {width:33px;height:108px;top:4px;left:226px;z-index:1006;}
+
+#composer-setup{
+/*	float:right;	*/
+}
+
+.composer-setup-item{
+	width:53px;
+	padding:0;
+}
+
+#composer-display{
+	clear:both;
+}
+.composer-display-item{
+	width:30%;
+	padding:5px;
+	ime-mode:disabled;
+	float:left;
+}
+.composer-display-item textarea{
+	width:100%;
+	height:200px;
+}
+
+.composer-display-length{
+	float:right;
+}
+.composer-display-radio{
+	float:left;
+}
+.composer-display-length input{
+	width:32px;
+}
+
+.composer-icon {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	vertical-align: text-top;
+	background-image: url(../img/composer.png);
+	background-repeat: no-repeat;
+}
+
+.l12{ background-position: -170px 0; }
+.l16{ background-position: -34px 0; }
+.l1{ background-position: 0 0; }
+.l24{ background-position: -85px 0; }
+.l2{ background-position: -51px 0; }
+.l3{ background-position: -17px 0; }
+.l4{ background-position: -102px 0; }
+.l64{ background-position: -136px 0; }
+.l6{ background-position: -68px 0; }
+.l8{ background-position: -153px 0; }
+.l9{ background-position: -119px 0; }
+.dot{ background-position: -187px 0; }
+.r1{ background-position: -204px 0; }
+.r16{ background-position: -221px 0; }
+.r2{ background-position: -238px 0; }
+.r32{ background-position: -255px 0; }
+.r4{ background-position: -272px 0; }
+.r64{ background-position: -289px 0; }
+.r8{ background-position: -306px 0; }
+.tie{ background-position: -323px 0; }

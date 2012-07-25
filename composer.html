@@ -8,7 +8,7 @@
 		<meta name="author" content="Logue">
 
 		<!-- Le styles -->
-		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="css/bootstrap.css" rel="stylesheet">
 		<style type="text/css">/*<![CDATA[*/
 body {
 	padding-top: 60px;
@@ -16,6 +16,7 @@ body {
 }
 /*]]>*/</style>
 		<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+		<link href="css/composer.css" rel="stylesheet">
 
 		<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
 		<!--[if lt IE 9]>
@@ -38,7 +39,7 @@ body {
 						<ul class="nav">
 							<li><a href="http://mabiassist.logue.be/PSGConverter">Official Page</a></li>
 							<li><a href="http://forum.logue.be/index.php?topic=531.0">Support Forum</a></li>
-							<li class="dropdown active">
+							<li class="dropdown">
 								<a class="dropdown-toggle" data-toggle="dropdown" href="#">GitHub Page</a>
 								<ul class="dropdown-menu">
 									<li><a href="https://github.com/logue/PSGConverter">Project Page</a></li>
@@ -49,7 +50,7 @@ body {
 									<li><a href="https://github.com/logue/PSGConverter/downloads">Downloads</a></li>
 								</ul>
 							</li>
-							<li><a href="composer.html">Web Composer</a></li>
+							<li class="active"><a href="composer.html">Web Composer</a></li>
 						</ul>
 					</div><!--/.nav-collapse -->
 				</div>
@@ -58,11 +59,154 @@ body {
 
 		<div class="container">
 			<header class="jumbotron subhead" id="overview">
-				<h1>Under Construction</h1>
-				<p class="lead"></p>
+				<h1>Web MML composer</h1>
+				<p class="lead">Under Construction</p>
 			</header>
 			<section id="composer">
+				<div class="row">
+					<div class="span5">
+						<table>
+							<tr>
+								<td>
+									<div id="composer-keyboard">
+										<div>
+										<a id="c"  title="C">C</a>
+										<a id="cs" title="C&#9839;"></a>
+										<a id="d"  title="D"></a>
+										<a id="ds" title="D&#9839;"></a>
+										<a id="e"  title="E"></a>
+										<a id="f"  title="F"></a>
+										<a id="fs" title="F&#9839;"></a>
+										<a id="g"  title="G"></a>
+										<a id="gs" title="G&#9839;"></a>
+										<a id="a"  title="A"></a>
+										<a id="as" title="A&#9839;"></a>
+										<a id="b"  title="B"></a>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div class="control-group">
+										<div class="controls">
+											<div class="input-prepend input-append">
+												<label for="tempo" class="add-on">Tempo</label>
+												<input class="span2" type="number" id="tempo" value="120" maxlength="3" min="32" max="255" />
+												<button class="btn" type="button" id="ApplyTempo" title="Apply Tempo"><i class="icon-ok"></i></button>
+											</div>
+										</div>
+										<div class="controls">
+											<div class="input-prepend">
+												<span class="add-on">Octave</span>
+												<input class="span1" type="number" id="octave" maxlength="1" value="4" min="1" max="8" />
+											</div>
+										</div>
+										<div class="controls">
+											<div class="input-prepend input-append">
+												<label for="volume" class="add-on">Volume</label>
+												<input class="span1" type="number" id="volume" value="8" maxlength="2" min="0" max="15" />
+												<button class="btn" id="ApplyVolume" title="Apply Volume"><i class="icon-ok"></i></button>
+											</div>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="span7">
+						<div class="control-group">
+							<label class="control-label">Note Length</label>
+							<div class="controls">
+								<div class="btn-group" data-toggle="buttons-radio">
+									<a class="NoteLength btn btn-small" id="note_1"  title="Whole note (Semibreve)"><span class="composer-icon l1"></span></a>
+									<a class="NoteLength btn btn-small" id="note_2"  title="Half note (Minim)" ><span class="composer-icon l2"></span></a>
+									<a class="NoteLength btn btn-small active" id="note_4"  title="Quater note (Crotchet)"><span class="composer-icon l4"></span></a>
+									<a class="NoteLength btn btn-small" id="note_8"  title="8th note (Quaver)"><span class="composer-icon l8"></span></a>
+									<a class="NoteLength btn btn-small" id="note_16" title="16th note (Semiquaver)"><span class="composer-icon l16"></span></a>
+									<a class="NoteLength btn btn-small" id="note_32" title="32nd note (Demisemiquaver)"><span class="composer-icon l32"></span></a>
+									<a class="NoteLength btn btn-small" id="note_64" title="64th note (Hemidemisemiquaver)"><span class="composer-icon l64"></span></a>
+									<a class="NoteLength btn btn-small" id="note_3"  title="3rd note (Triplet)"><span class="composer-icon l3"></span></a>
+									<a class="NoteLength btn btn-small" id="note_6"  title="6th note (Half triplet)"><span class="composer-icon l6"></span></a>
+									<a class="NoteLength btn btn-small" id="note_9" title="12nd note (Quater triplet)"><span class="composer-icon l9"></span></a>
+									<a class="NoteLength btn btn-small" id="note_12" title="24th note (16th Triplet)"><span class="composer-icon l12"></span></a>
+								</div>
+								<a class="btn btn-info" data-toggle="button" id="tie" title="Tie"><span class="composer-icon tie"></span></a>
+								<a class="btn btn-success" data-toggle="button" id="dotted" title="Dotted"><span class="composer-icon dot"></span></a>
+								<input type="hidden" value="4" name="length" id="length" />
+							</div>
+						</div>
+						<div class="control-group">
+							<label class="control-label">Note Length</label>
+							<div class="controls">
+								<div class="btn-group" data-toggle="buttons-radio">
+									<a class="Rest btn btn-small btn-warning" id="rest_1"  title="Whole rest"><span class="composer-icon r1"></span></a>
+									<a class="Rest btn btn-small btn-warning" id="rest_2"  title="Half rest"><span class="composer-icon r2"></span></a>
+									<a class="Rest btn btn-small btn-warning" id="rest_4"  title="Quater rest"><span class="composer-icon r4"></span></a>
+									<a class="Rest btn btn-small btn-warning" id="rest_8"  title="8th rest"><span class="composer-icon r8"></span></a>
+									<a class="Rest btn btn-small btn-warning" id="rest_16" title="16th rest"><span class="composer-icon r16"></span></a>
+									<a class="Rest btn btn-small btn-warning" id="rest_32" title="32nd rest"><span class="composer-icon r32"></span></a>
+									<a class="Rest btn btn-small btn-warning" id="rest_64" title="64th rest"><span class="composer-icon r64"></span></a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 				
+				<!-- MML Form -->
+				<div id="composer-display" class="row">
+					<div class="span4">
+						<div class="row">
+							<div class="span2">
+								<label for="ch1_radio">
+									<input type="radio" name="track" class="track" id="ch1_radio" value="ch1" checked="checked" />
+									Melody
+								</label>
+							</div>
+							<div class="span2">
+								<label for="ch1_length">
+									Length
+									<input id="ch1_length" disabled="disabled" type="text" value="0" class="span1"/>
+								</label>
+							</div>
+						</div>
+						<textarea id="ch1" placeholder="Melody" class="span4"></textarea>
+					</div>
+					<div class="span4">
+						<div class="row">
+							<div class="span2">
+								<label for="ch2_radio">
+									<input type="radio" name="track" class="track" id="ch2_radio" value="ch2" />
+									Chord 1
+								</label>
+							</div>
+							<div class="span2">
+								<label for="ch2_length">
+									Length
+									<input id="ch2_length" disabled="disabled" type="text" value="0" class="span1"/>
+								</label>
+							</div>
+						</div>
+						<textarea id="ch2" placeholder="Chord 1" class="span4"></textarea>
+					</div>
+					<div class="span4">
+						<div class="row">
+							<div class="span2">
+								<label for="ch2_radio">
+									<input type="radio" name="track" class="track" id="ch3_radio" value="ch3" />
+									Chord 2
+								</label>
+							</div>
+							<div class="span2">
+								<label for="ch3_length">
+									Length
+									<input id="ch3_length" disabled="disabled" type="text" value="0" class="span1"/>
+								</label>
+							</div>
+						</div>
+						<textarea id="ch3" placeholder="Chord 2" class="span4"></textarea>
+					</div>
+				</div>
 			</section>
 			
 			<footer class="footer">
@@ -82,22 +226,14 @@ body {
 $(document).ready(function(){
 	// make code pretty
 	window.prettyPrint && prettyPrint();
+	
+	$('*[title]').tooltip({placement:'bottom'});
 
 	$.getScript(('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js',function(){
 		try {
 			var pageTracker = _gat._getTracker("UA-33600926-1");
 			pageTracker._trackPageview();
 		} catch(err) {}
-		
-		$('a').each(function(){
-			var href = $(this).attr('href');
-			if ((href.match(/^https?\:/i)) && (!href.match(document.domain))){
-				$(this).click(function() {
-					var extLink = href.replace(/^https?\:\/\//i, '');
-					pageTracker._trackEvent('External', 'Click', extLink);
-				});
-			}
-		});
 	});
 });
 /*]]>*/</script>
