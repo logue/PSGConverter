@@ -1,6 +1,6 @@
 /*!
  * PSGConverter.js
- * v1.1.1
+ * v1.1.2
  * Copyright (c)2007-2012 Logue <http://logue.be/> All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -309,17 +309,23 @@ var insts = {
 
 	//MMLを正規化
 	function mml_sanitize(str) {
-		var data = str.match(/MML\@\s*([\s0-9a-glnortvA-GLNORTV#<>.&+-]*),\s*([\s0-9a-glnortvA-GLNORTV#<>.&+-]*),\s*([\s0-9a-glnortvA-GLNORTV#<>.&+-]*);/);
-		return [data[1],data[2],data[3]];
+		var mml = str.replace(/\r\n|\n\r|\n|\r|\s|/g, '');	// Remove line break and space
+		var ret = mml.match(/MML\@([0-9A-GLNORTV#<>.&+-]*?),([0-9A-GLNORTV#<>.&+-]*?),([0-9A-GLNORTV#<>.&+-]*?);/i);
+		if (typeof(ret) !=='object'){
+			return false;
+		}else{
+			ret.shift();
+			return ret;
+		}
 	}
 
 	// BASE64 (RFC2045) Encode/Decode for string in JavaScript
 	// Version 1.2 Apr. 8 2004 written by MIZUTANI Tociyuki
 	// Copyright 2003-2004 MIZUTANI Tociyuki
 	// http://tociyuki.cool.ne.jp/archive/base64.html
-
 	function base64encode(s){
 		if (window.btoa){
+			// Browser native function
 			return btoa(s);
 		}else{
 			var base64list = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
@@ -344,7 +350,13 @@ var insts = {
 	}
 	
 	function mml_player(param, autoplay, debug){
-		var url = 'data:audio/midi;base64,'+base64encode(mabimml_genmidi(param) );
+		var isMSIE = /*@cc_on!@*/false;
+		var url;
+		if (!isMSIE) {
+			url = 'data:audio/midi;base64,'+base64encode(mabimml_genmidi(param) );
+		}else{
+			url = 'http://comp.mabinogi.jp/PSGConverter.exe? /i'+param.inst+ ' ' + encodeURIComponent(param.mml);
+		}
 		return [
 			(debug ? '<a class="btn btn-small mml-debug" href="'+url+'">debug.mid</a>' : ''),
 			'<div class="mml-player">',
@@ -368,8 +380,7 @@ var insts = {
 			var self = this;
 			var $this = $(this);
 			var data = $this.data();
-			//var debug = data.debug;
-			var debug = true;
+			var debug = data.debug ? true : false;
 			var param = {};
 			
 			if (data.instName !== '' && insts[data.instName] ){
@@ -393,9 +404,13 @@ var insts = {
 			
 			if (data.pan !== '') param.pan = data.pan;
 			if (data.effect !== '') param.effect = data.effect;
-			param.mml = mml_sanitize($this.contents()[0].nodeValue);	// MML配列
-
-			$this.before(mml_player(param,false, debug));
+			var mml = mml_sanitize($this.contents()[0].nodeValue);	// MML配列
+			if (mml === false){
+				$this.before('<p class="alert alert-error">Could not parse MML. Invalied format?</p>');
+			}else{
+				param.mml = mml;
+				$this.before(mml_player(param,false, debug));
+			}
 		});
 	});
 })(jQuery);
