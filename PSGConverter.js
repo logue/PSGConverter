@@ -356,6 +356,7 @@ var insts = {
 			url = 'data:audio/midi;base64,'+base64encode(mabimml_genmidi(param) );
 		}else{
 			url = 'http://comp.mabinogi.jp/PSGConverter.exe? /i'+param.inst+ ' ' + encodeURIComponent(param.mml);
+			// url = 'PSGConverter.php?i='+param.inst+ '&amp;p='+ param.pan+'&amp;e='+param.effect+'&amp;s=' + encodeURIComponent(param.mml);
 		}
 		var ensemble = (param.group !== 0) ? true : false;
 		console.log();
@@ -428,7 +429,7 @@ var insts = {
 			count++;
 		});
 		if (typeof(ZeroClipboard) !== 'undefined' && location.protocol !=='file:' ){
-			ZeroClipboard.setMoviePath('http://logue.github.com/js/ZeroClipboard/ZeroClipboard.swf');
+			ZeroClipboard.setMoviePath('http://logue.github.com/PSGConverter/js/ZeroClipboard/ZeroClipboard.swf');
 			$('.mml-copy').each(function(){
 				var clip = new ZeroClipboard.Client();
 				clip.setText($(this).attr('data-str'));
