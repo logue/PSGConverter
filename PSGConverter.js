@@ -29,10 +29,10 @@ var insts = {
 	'Chalumeau':	{inst: 71,  max: 59, min: 24},	// 72.  Clarinet
 	'Tuba':			{inst: 58,  max: 59, min: 24},	// 59.  Tuba
 	'Lyre':			{inst: 46,  max: 88, min: 16},	// 47.  Orchestral Harp
-	'Snare':		{inst: 48,  max: 38, min: 38},	// Drum Part
-	'Drum':			{inst: 48,  max: 40, min: 40},
-	'Bass Drum':	{inst: 48,  max: 36, min: 36},
-	'Cymbal':		{inst: 48,  max: 49, min: 49},
+	'Snare':		{inst: 1,  max: 38, min: 38},	// Drum Part
+	'Drum':			{inst: 1,  max: 40, min: 40},
+	'Bass Drum':	{inst: 1,  max: 36, min: 36},
+	'Cymbal':		{inst: 1,  max: 49, min: 49},
 	'Xylophone':	{inst: 14,  max: 88, min: 16}	// 14.  Xylophone
 };
 
@@ -367,7 +367,7 @@ var insts = {
 			'<div class="mml-player" data-group="'+param.group+'">',
 				'<object type="audio/midi" ' + 'width="240" height="16" ' +
 					//	( ensemble ? 'width="0" height="0" ' : 'width="240" height="16" ') + 
-						( isMSIE ? 'classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab"' : '' ) + '>',
+						( isMSIE ? 'classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab"' : 'data="'+url+'"' ) + '>',
 					'<param name="controller" value="'+ ( ensemble ? 'false' : 'true') +'" />',
 					'<param name="src" value="'+url+'" />',
 					'<param name="autoplay" value="'+(autoplay ? true : false)+'" />',
