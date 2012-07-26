@@ -198,7 +198,7 @@ var insts = {
 					note += 12; // 1オクターブ低く演奏される不具合を修正 060426
 				}else{
 					// ドラムパートの場合ノートを強制的に指定
-					note = isDrum;
+					note = Max;
 				}
 
 				// c&dなど無効なタイの処理
@@ -349,7 +349,7 @@ var insts = {
 		}
 	}
 	
-	function mml_player(param, autoplay){
+	function mml_player(param){
 		var isMSIE = /*@cc_on!@*/false;
 		var url;
 		if (!isMSIE) {
@@ -358,23 +358,27 @@ var insts = {
 			url = 'http://comp.mabinogi.jp/PSGConverter.exe? /i'+param.inst+ ' ' + encodeURIComponent(param.mml);
 		}
 		var ensemble = (param.group !== 0) ? true : false;
+		
 		return [
 			(param.debug ? '<a class="btn btn-small mml-debug" href="'+url+'">debug.mid</a>' : ''),
 			(ensemble ? 
-				'<button class="btn ensemble-rewind" data-playgroup="'+param.group+'">Rewind</button>' + 
-				'<button class="btn btn-primary ensemble-play" data-playgroup="'+param.group+'">Play</button>' + 
-				'<button class="btn btn-danger btn ensemble-pause" data-playgroup="'+param.group+'" style="display:none;">Pause</button>' : ''),
+				'<button class="btn btn-mini ensemble-rewind" data-playgroup="'+param.group+'">Rewind</button>' + 
+				'<button class="btn btn-mini btn-primary ensemble-play" data-playgroup="'+param.group+'">Play</button>' + 
+				'<button class="btn btn-mini btn-danger btn ensemble-pause" data-playgroup="'+param.group+'" style="display:none;">Pause</button>' : ''),
+			(ZeroClipboard && location.protocol !=='file:' ) ? '<button id="mmlcopy'+param.id+'" class="btn btn-mini btn-info mml-copy" data-str="'+('MML@'+param.mml[0]+','+param.mml[1]+','+param.mml[2]+';')+'">Copy</button>' : '',
 			'<div class="mml-player" data-group="'+param.group+'">',
-				'<object type="audio/midi" ' + 'width="240" height="16" ' +
-					//	( ensemble ? 'width="0" height="0" ' : 'width="240" height="16" ') + 
+				'<object type="audio/midi" ' + 
+						( ensemble ? 'width="0" height="0" ' : 'width="240" height="16" ') +
 						( isMSIE ? 'classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab"' : 'data="'+url+'"' ) + '>',
 					'<param name="controller" value="'+ ( ensemble ? 'false' : 'true') +'" />',
 					'<param name="src" value="'+url+'" />',
-					'<param name="autoplay" value="'+(autoplay ? true : false)+'" />',
+					'<param name="autoplay" value="false" />',
 					'<param name="pluginspage" value="http://www.apple.com/quicktime/download/" />',
 				'</object>',
 			'</div>'
+			
 		].join("\n");
+		
 	}
 	
 	function mml_genplayer(dom, count){
@@ -386,16 +390,16 @@ var insts = {
 		if (data.instName !== '' && insts[data.instName] ){
 			param = {
 				inst : insts[data.instName].inst,
-				max : insts[data.instName].max,
-				min : insts[data.instName].min
+				max  : insts[data.instName].max,
+				min  : insts[data.instName].min
 			};
 		}else if (data.inst !== ''){
 			for (var name in insts) {
 				if (insts[name].inst = data.inst){
 					param = {
 						inst : insts[name].inst,
-						max : insts[name].max,
-						min : insts[name].min
+						max  : insts[name].max,
+						min  : insts[name].min
 					};
 					break;
 				}
@@ -406,13 +410,15 @@ var insts = {
 		if (mml === false){
 			$this.before('<p class="alert alert-error">Could not parse MML. Invalied format?</p>');
 		}else{
-			param.mml = mml;
 			param.group  = data.group  ? data.group : 0;
 			param.debug  = data.debug  ? true : false;
 			param.pan    = data.pan    ? data.pan : 64;
 			param.effect = data.effect ? data.effect : 40;
-			$.data(this,'param',param);
-			$this.before(mml_player(param,false) );
+			param.mml    = mml;
+			param.id     = count;
+
+			$this.before(mml_player(param));
+			
 		}
 	}
 
@@ -422,10 +428,14 @@ var insts = {
 			mml_genplayer(this, count);
 			count++;
 		});
-		$('object').each(function(){
-			
-		});
-		var isPlay = [];
+		if (ZeroClipboard && location.protocol !=='file:' ){
+			ZeroClipboard.setMoviePath('ZeroClipboard/ZeroClipboard.swf');
+			$('.mml-copy').each(function(){
+				var clip = new ZeroClipboard.Client();
+				clip.setText($(this).attr('data-str'));
+				clip.glue($(this).attr("id"));
+			});
+		}
 		$('.ensemble-rewind').click(function(){
 			var group = $(this).data().playgroup;
 			$('*[data-group='+group+'] object').each(function(){
