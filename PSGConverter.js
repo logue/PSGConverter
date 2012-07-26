@@ -108,10 +108,10 @@ var insts = {
 			{'time' : 288,	'msg' : String.fromCharCode(0xb0 + chid, 91, effect)}	// エフェクト
 		];
 
-		var notes = mml.match(/[a-glnortvA-GLNORTV<>][\+\#-]?[0-9]*\.?&?/g);
+		var notes = mml.match(/[A-GLNORTV<>][\+\#-]?[0-9]*\.?&?/ig);
 
 		for(var mnid=0; mnid < notes.length; mnid++) {
-			if(notes[mnid].match(/([lotvLOTV<>])([1-9][0-9]*|0?)(\.?)(&?)/)) {
+			if( notes[mnid].match(/([LOTV<>])([1-9][0-9]*|0?)(\.?)(&?)/i) ) {
 				if(tieEnabled == 1 && RegExp.$4 != '&') {
 					tieEnabled = 0;
 					part_msgs.push({'time':time,'msg':String.fromCharCode(0x80+chid,cNote,Minim)});
@@ -151,15 +151,15 @@ var insts = {
 					
 					// 簡易オクターブ設定 {<>}
 					case '<':
-						cOctave = (cOctave<=1)? 1: (cOctave-1);
+						cOctave = (cOctave<=1) ? 1: (cOctave-1);
 						break;
 					case '>':
-						cOctave = (cOctave>=8)? 8: (cOctave+1);
+						cOctave = (cOctave>=8) ? 8: (cOctave+1);
 						break;
 				}
 			}
 			
-			if( notes[mnid].match(/([a-gnA-GN])([\+\#-]?)([0-9]*)(\.?)(&?)/) ) {
+			if( notes[mnid].match(/([A-GN])([\+\#-]?)([0-9]*)(\.?)(&?)/i) ) {
 				var tick = cLength;
 				var val = RegExp.$3;
 				switch (RegExp.$1){
@@ -324,10 +324,10 @@ var insts = {
 	// Copyright 2003-2004 MIZUTANI Tociyuki
 	// http://tociyuki.cool.ne.jp/archive/base64.html
 	function base64encode(s){
-		if (window.btoa){
+		try{
 			// Browser native function
 			return btoa(s);
-		}else{
+		}catch(e){
 			var base64list = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 			var t = '', p = -6, a = 0, i = 0, v = 0, c;
 			while ( (i < s.length) || (p > -6) ) {
@@ -349,7 +349,7 @@ var insts = {
 		}
 	}
 	
-	function mml_player(param, autoplay, debug){
+	function mml_player(param, autoplay){
 		var isMSIE = /*@cc_on!@*/false;
 		var url;
 		if (!isMSIE) {
@@ -357,60 +357,96 @@ var insts = {
 		}else{
 			url = 'http://comp.mabinogi.jp/PSGConverter.exe? /i'+param.inst+ ' ' + encodeURIComponent(param.mml);
 		}
+		var ensemble = (param.group !== 0) ? true : false;
 		return [
-			(debug ? '<a class="btn btn-small mml-debug" href="'+url+'">debug.mid</a>' : ''),
-			'<div class="mml-player">',
-				'<object classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab" width="240" height="16">',
-					'<param name="controller" value="true" />',
-					'<param name="autoplay" value="'+(autoplay ? true : false)+'" />',
+			(param.debug ? '<a class="btn btn-small mml-debug" href="'+url+'">debug.mid</a>' : ''),
+			(ensemble ? 
+				'<button class="btn ensemble-rewind" data-playgroup="'+param.group+'">Rewind</button>' + 
+				'<button class="btn btn-primary ensemble-play" data-playgroup="'+param.group+'">Play</button>' + 
+				'<button class="btn btn-danger btn ensemble-pause" data-playgroup="'+param.group+'" style="display:none;">Pause</button>' : ''),
+			'<div class="mml-player" data-group="'+param.group+'">',
+				'<object type="audio/midi" ' + 'width="240" height="16" ' +
+					//	( ensemble ? 'width="0" height="0" ' : 'width="240" height="16" ') + 
+						( isMSIE ? 'classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab"' : '' ) + '>',
+					'<param name="controller" value="'+ ( ensemble ? 'false' : 'true') +'" />',
 					'<param name="src" value="'+url+'" />',
+					'<param name="autoplay" value="'+(autoplay ? true : false)+'" />',
 					'<param name="pluginspage" value="http://www.apple.com/quicktime/download/" />',
-					'<object type="audio/midi" width="240" height="16" data="'+url+'">',
-						'<param name="controller" value="true" />',
-						'<param name="autoplay" value="'+(autoplay ? true : false)+'" />',
-						'<param name="pluginspage" value="http://www.apple.com/quicktime/download/" />',
-					'</object>',
 				'</object>',
 			'</div>'
 		].join("\n");
 	}
+	
+	function mml_genplayer(dom, count){
+		var self = dom;
+		var $this = $(dom);
+		var data = $this.data();
+		var param = {};
 
-	$(document).ready(function(){
-		$('.mabimml').each(function(){
-			var self = this;
-			var $this = $(this);
-			var data = $this.data();
-			var debug = data.debug ? true : false;
-			var param = {};
-			
-			if (data.instName !== '' && insts[data.instName] ){
-				param = {
-					inst : insts[data.instName].inst,
-					max : insts[data.instName].max,
-					min : insts[data.instName].min
-				};
-			}else if (data.inst !== ''){
-				for (var name in insts) {
-					if (insts[name].inst = data.inst){
-						param = {
-							inst : insts[name].inst,
-							max : insts[name].max,
-							min : insts[name].min
-						};
-						break;
-					}
+		if (data.instName !== '' && insts[data.instName] ){
+			param = {
+				inst : insts[data.instName].inst,
+				max : insts[data.instName].max,
+				min : insts[data.instName].min
+			};
+		}else if (data.inst !== ''){
+			for (var name in insts) {
+				if (insts[name].inst = data.inst){
+					param = {
+						inst : insts[name].inst,
+						max : insts[name].max,
+						min : insts[name].min
+					};
+					break;
 				}
 			}
+		}
+		
+		var mml = mml_sanitize($this.contents()[0].nodeValue);	// MML配列
+		if (mml === false){
+			$this.before('<p class="alert alert-error">Could not parse MML. Invalied format?</p>');
+		}else{
+			param.mml = mml;
+			param.group  = data.group  ? data.group : 0;
+			param.debug  = data.debug  ? true : false;
+			param.pan    = data.pan    ? data.pan : 64;
+			param.effect = data.effect ? data.effect : 40;
+			$.data(this,'param',param);
+			$this.before(mml_player(param,false) );
+		}
+	}
+
+	$(document).ready(function(){
+		var count = 0;
+		$('.mabimml').each(function(){
+			mml_genplayer(this, count);
+			count++;
+		});
+		$('object').each(function(){
 			
-			if (data.pan !== '') param.pan = data.pan;
-			if (data.effect !== '') param.effect = data.effect;
-			var mml = mml_sanitize($this.contents()[0].nodeValue);	// MML配列
-			if (mml === false){
-				$this.before('<p class="alert alert-error">Could not parse MML. Invalied format?</p>');
-			}else{
-				param.mml = mml;
-				$this.before(mml_player(param,false, debug));
-			}
+		});
+		var isPlay = [];
+		$('.ensemble-rewind').click(function(){
+			var group = $(this).data().playgroup;
+			$('*[data-group='+group+'] object').each(function(){
+				$(this)[0].Rewind();
+			});
+		});
+		$('.ensemble-play').click(function(){
+			var group = $(this).data().playgroup;
+			$('*[data-group='+group+'] object').each(function(){
+				$(this)[0].Play();
+			});
+			$('.ensemble-play[data-playgroup='+group+']').css({'display':'none'});
+			$('.ensemble-pause[data-playgroup='+group+']').css({'display':'inline'});
+		});
+		$('.ensemble-pause').click(function(){
+			var group = $(this).data().playgroup;
+			$('*[data-group='+group+'] object').each(function(){
+				$(this)[0].Stop();
+			});
+			$('.ensemble-play[data-playgroup='+group+']').css({'display':'inline'});
+			$('.ensemble-pause[data-playgroup='+group+']').css({'display':'none'});
 		});
 	});
 })(jQuery);
