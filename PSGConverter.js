@@ -358,14 +358,14 @@ var insts = {
 			url = 'http://comp.mabinogi.jp/PSGConverter.exe? /i'+param.inst+ ' ' + encodeURIComponent(param.mml);
 		}
 		var ensemble = (param.group !== 0) ? true : false;
-		
+		console.log();
 		return [
 			(param.debug ? '<a class="btn btn-small mml-debug" href="'+url+'">debug.mid</a>' : ''),
 			(ensemble ? 
 				'<button class="btn btn-mini ensemble-rewind" data-playgroup="'+param.group+'">Rewind</button>' + 
 				'<button class="btn btn-mini btn-primary ensemble-play" data-playgroup="'+param.group+'">Play</button>' + 
 				'<button class="btn btn-mini btn-danger btn ensemble-pause" data-playgroup="'+param.group+'" style="display:none;">Pause</button>' : ''),
-			(ZeroClipboard && location.protocol !=='file:' ) ? '<button id="mmlcopy'+param.id+'" class="btn btn-mini btn-info mml-copy" data-str="'+('MML@'+param.mml[0]+','+param.mml[1]+','+param.mml[2]+';')+'">Copy</button>' : '',
+			(typeof(ZeroClipboard) !== 'undefined' && location.protocol !=='file:' ) ? '<button id="mmlcopy'+param.id+'" class="btn btn-mini btn-info mml-copy" data-str="'+('MML@'+param.mml[0]+','+param.mml[1]+','+param.mml[2]+';')+'">Copy</button>' : '',
 			'<div class="mml-player" data-group="'+param.group+'">',
 				'<object type="audio/midi" ' + 
 						( ensemble ? 'width="0" height="0" ' : 'width="240" height="16" ') +
@@ -418,7 +418,6 @@ var insts = {
 			param.id     = count;
 
 			$this.before(mml_player(param));
-			
 		}
 	}
 
@@ -428,12 +427,12 @@ var insts = {
 			mml_genplayer(this, count);
 			count++;
 		});
-		if (ZeroClipboard && location.protocol !=='file:' ){
-			ZeroClipboard.setMoviePath('ZeroClipboard/ZeroClipboard.swf');
+		if (typeof(ZeroClipboard) !== 'undefined' && location.protocol !=='file:' ){
+			ZeroClipboard.setMoviePath('http://logue.github.com/js/ZeroClipboard/ZeroClipboard.swf');
 			$('.mml-copy').each(function(){
 				var clip = new ZeroClipboard.Client();
 				clip.setText($(this).attr('data-str'));
-				clip.glue($(this).attr("id"));
+				clip.glue($(this).attr('id'));
 			});
 		}
 		$('.ensemble-rewind').click(function(){
