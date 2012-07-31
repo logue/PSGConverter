@@ -18,6 +18,7 @@ body {
 /*]]>*/</style>
 		<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
 		<link href="js/google-code-prettify/prettify.css" rel="stylesheet">
+		<link href="css/composer.css" rel="stylesheet">
 
 		<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
 		<!--[if lt IE 9]>
@@ -25,7 +26,7 @@ body {
 		<![endif]-->
 	</head>
 
-	<body data-spy="scroll" data-target=".subnav" data-offset="50">
+	<body data-spy="scroll" data-target=".subnav" data-offset="200">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -71,10 +72,19 @@ body {
 					<a href="./demo.html" class="btn btn-large">Demo</a>
 					<a href="https://github.com/logue/PSGConverter/downloads" class="btn btn-primary btn-large">Download</a>
 				</p>
+				<div class="subnav">
+					<ul class="nav nav-pills">
+						<li><a href="#overview">Overview</a></li>
+						<li><a href="#usage">Usage</a></li>
+						<li><a href="#example">Example</a></li>
+						<li><a href="#builder">Builder</a></li>
+					</ul>
+				</div>
 			</header>
 			<section id="usage">
-				<h2>Usage</h2>
-				
+				<div class="page-header">
+					<h1>Usage</h1>
+				</div>
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#install" data-toggle="tab">Install</a></li>
 					<li><a href="#option" data-toggle="tab">Option</a></li>
@@ -227,9 +237,11 @@ body {
 			</section>
 			
 			<section id="example">
-				<h2>Example</h2>
+				<div class="page-header">
+					<h1>Example</h1>
+				</div
 				<p>Notice: These sample does not works copy to clipboard feature for ZeroClipboard limitation.</p>
-				<h3>Basic [Lemmings Tim2]</h3>
+				<h2>Basic [Lemmings Tim2]</h2>
 				<ul class="nav nav-tabs">
 					<li class="tab-pane" class="active"><a href="#source" data-toggle="tab">HTML Source</a></li>
 					<li class="tab-pane"><a href="#sample" data-toggle="tab">Sample</a></li>
@@ -251,7 +263,7 @@ l1.rrrrrrv15&lt;f2l4.ag1c8a2b+g1r8f2ag1c8a2&gt;cl1dr8erel8ro2gagagab+cr&gt;cr&lt
 					</div>
 				</div>
 
-				<h3>Ensemble example [Rufus Welcoming Ceremony / Final Fantasy 7]</h3>
+				<h2>Ensemble example [Rufus Welcoming Ceremony / Final Fantasy 7]</h2>
 				<p>This program also support ensemble emulation.</p>
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#e-source" data-toggle="tab">HTML Source</a></li>
@@ -324,6 +336,81 @@ r;</pre>
 					</div>
 				</div>
 			</section>
+			
+			<section id="builder">
+				
+				<div class="page-header">
+					<h1>Builder</h1>
+				</div>
+				<h2>Input</h2>
+				<div class="row">
+					
+					<div class="span6">
+						<div class="form-horizontal">
+							<div class="control-group">
+								<label class="control-label" for="inst">Instrument</label>
+								<div class="controls">
+									<select id="inst" class="span3">
+										<option>Lute</option>
+										<option>Ukulele</option>
+										<option>Mandorin</option>
+										<option>Whistle</option>
+										<option>Flute</option>
+										<option>Roncadora</option>
+										<option>Chalumeau</option>
+										<option>Tuba</option>
+										<option>Lyre</option>
+										<option>Snare</option>
+										<option>Drum</option>
+										<option>Bass Drum</option>
+										<option>Cymbal</option>
+										<option>Xylophone</option>
+									</select>
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label" for="pan">Panpod</label>
+								<div class="controls">
+									<input type="number" id="pan" placeholder="64" value="64" max="127" min="0" class="span2" />
+									<p class="help-block">Left is 0, center is 64, Right is 127.</p>
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label" for="effect">Effect depth</label>
+								<div class="controls">
+									<input type="number" id="effect" placeholder="40" value="40" max="127" min="0" class="span2" />
+									<p class="help-block">default is 40.</p>
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label" for="effect">Ensemble Group</label>
+								<div class="controls">
+									<input type="text" id="group" placeholder="0" value="0" class="span2" />
+									<p class="help-block">0 is not ensemble mml.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="span6">
+						<div class="control-group">
+							<label class="control-label" for="mml">MML <span id="rank"></span></label>
+							<div class="controls">
+								<textarea id="mml" rows="3" placeholder="MML" class="mml"></textarea>
+							</div>
+						</div>
+						<div class="form-actions">
+							<button id="execute" class="btn btn-primary">Generate HTML embed code</button>
+						</div>
+					</div>
+				</div>
+				<h2>Output</h2>
+				<div class="control-group">
+					<label class="control-label" for="code">Output HTML code </label>
+					<div class="controls">
+						<textarea id="code" placeholder="Embed html code." class="span12"></textarea>
+					</div>
+				</div>
+			</section>
 				
 			<footer class="footer">
 				<p class="pull-right"><a href="#">Back to top</a></p>
@@ -341,6 +428,92 @@ r;</pre>
 $(document).ready(function(){
 	// make code pretty
 	window.prettyPrint && prettyPrint();
+
+	// fix sub nav on scroll
+	var $win = $(window)
+	, $nav = $('.subnav')
+	, navTop = $('.subnav').length && $('.subnav').offset().top - 40
+	, isFixed = 0
+	processScroll()
+
+	// hack sad times - holdover until rewrite for 2.1
+	$nav.on('click', function () {
+		if (!isFixed) setTimeout(function () {  $win.scrollTop($win.scrollTop() - 47) }, 10)
+	})
+
+	$win.on('scroll', processScroll)
+
+	function processScroll() {
+		var i, scrollTop = $win.scrollTop()
+		if (scrollTop >= navTop && !isFixed) {
+			isFixed = 1
+			$nav.addClass('subnav-fixed')
+		} else if (scrollTop <= navTop && isFixed) {
+			isFixed = 0
+			$nav.removeClass('subnav-fixed')
+		}
+	}
+	
+	$('.mml').change(function(){
+		var $this = $(this);
+		try{
+			var str = $this.val();
+			str = str.replace(/\r\n|\n\r|\n|\r|\s|/g, '');
+			var mml = str.match(/MML\@([0-9A-GLNORTV#<>.&+-]*?),([0-9A-GLNORTV#<>.&+-]*?),([0-9A-GLNORTV#<>.&+-]*?);/i);
+			$this.val(mml[0]);
+			var ranks = [
+				[ "P", 200, 100, 0 ],
+				[ "F", 400, 200, 100 ],
+				[ "E", 500, 200, 100 ],
+				[ "D", 600, 250, 150 ],
+				[ "C", 650, 250, 200 ],
+				[ "B", 700, 300, 200 ],
+				[ "A", 750, 300, 200 ],
+				[ "9", 800, 350, 200 ],
+				[ "8", 850, 400, 200 ],
+				[ "7", 900, 400, 200 ],
+				[ "6", 950, 450, 200 ],
+				[ "5", 1000, 500, 250 ],
+				[ "4", 1050, 550, 300 ],
+				[ "3", 1100, 600, 350 ],
+				[ "2", 1150, 700, 400 ],
+				[ "1", 1200, 800, 500 ]
+			];
+			for( var i = 0; i < ranks.length; i++ ){
+				var r = ranks[i];
+				if( r[1] >= mml[1].length && r[2] >= mml[2].length && r[3] >= mml[3].length ){
+					$('#rank').html('<span class="label">Rank: '+r[0]+'</span> <span class="label label-info">Melody: '+mml[0].length + ' / Chord1: '+mml[1].length+' / Chord2: '+mml[2].length+'</span>');
+					break;
+				}
+			}
+			$this.parent().parent().removeClass('error');
+		}catch(e){
+			$this.parent().parent().removeClass('error');
+		}
+	});
+	
+	$('#execute').click(function(){
+		var mml = $('#mml').val();
+		mml = mml.replace(/\r\n|\n\r|\n|\r|\s|/g, '');	// Remove line break and space
+		try{
+			var ret = mml.match(/MML\@([0-9A-GLNORTV#<>.&+-]*?),([0-9A-GLNORTV#<>.&+-]*?),([0-9A-GLNORTV#<>.&+-]*?);/i);
+			var str = ret[0].replace(/&/g, '&amp;');
+			str = str.replace(/"/g, '&quot;');	//"
+			str = str.replace(/</g, '&lt;');
+			str = str.replace(/>/g, '&gt;');
+
+			$('#mml').parent().parent().removeClass('error');
+			var template = [
+				'<pre class="mabimml" data-inst="'+$('#inst').val()+'" data-pan="'+$('#pan').val()+ '" data-effect="'+$('#effect').val()+'" data-group="'+$('#group').val()+'">',
+				str,
+				'</pre>'
+			].join('');
+			$('#code').val(template);
+		}catch(e){
+			console.error(e);
+			$('#mml').parent().parent().addClass('error');
+		}
+	});
 
 	$.getScript(('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js',function(){
 		try {
