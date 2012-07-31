@@ -18,25 +18,25 @@
  */
 
 // Based On えむえる
+(function($){
+	var isMSIE = /*@cc_on!@*/false;
 
-var insts = {
-	'Lute':			{inst: 24,  max: 88, min: 16},	// 25.  Acoustic Guitar (nylon)
-	'Ukulele':		{inst: 28,  max: 88, min: 16},	// 29.  Electric Guitar (muted)
-	'Mandorin':		{inst: 105, max: 88, min: 16},	// 106. Banjo
-	'Whistle':		{inst: 78,  max: 88, min: 60},	// 79.  Whistle
-	'Flute':		{inst: 73,  max: 83, min: 48},	// 74.  Flute
-	'Roncadora':	{inst: 77,  max: 83, min: 48},	// 78.  Shakuhachi
-	'Chalumeau':	{inst: 71,  max: 59, min: 24},	// 72.  Clarinet
-	'Tuba':			{inst: 58,  max: 59, min: 24},	// 59.  Tuba
-	'Lyre':			{inst: 46,  max: 88, min: 16},	// 47.  Orchestral Harp
-	'Snare':		{inst: 1,  max: 38, min: 38},	// Drum Part
-	'Drum':			{inst: 1,  max: 40, min: 40},
-	'Bass Drum':	{inst: 1,  max: 36, min: 36},
-	'Cymbal':		{inst: 1,  max: 49, min: 49},
-	'Xylophone':	{inst: 14,  max: 88, min: 16}	// 14.  Xylophone
-};
-
-(function($){	
+	var insts = {
+		'Lute':			{inst: 24,  max: 88, min: 16},	// 25.  Acoustic Guitar (nylon)
+		'Ukulele':		{inst: 28,  max: 88, min: 16},	// 29.  Electric Guitar (muted)
+		'Mandorin':		{inst: 105, max: 88, min: 16},	// 106. Banjo
+		'Whistle':		{inst: 78,  max: 88, min: 60},	// 79.  Whistle
+		'Flute':		{inst: 73,  max: 83, min: 48},	// 74.  Flute
+		'Roncadora':	{inst: 77,  max: 83, min: 48},	// 78.  Shakuhachi
+		'Chalumeau':	{inst: 71,  max: 59, min: 24},	// 72.  Clarinet
+		'Tuba':			{inst: 58,  max: 59, min: 24},	// 59.  Tuba
+		'Lyre':			{inst: 46,  max: 88, min: 16},	// 47.  Orchestral Harp
+		'Snare':		{inst: 1,  max: 38, min: 38},	// Drum Part
+		'Drum':			{inst: 1,  max: 40, min: 40},
+		'Bass Drum':	{inst: 1,  max: 36, min: 36},
+		'Cymbal':		{inst: 1,  max: 49, min: 49},
+		'Xylophone':	{inst: 14,  max: 88, min: 16}	// 14.  Xylophone
+	};
 	
 	var dLength = 96;	// = 1quarternote = 32tick
 	var Semibreve = dLength*4;	// 1小節
@@ -53,7 +53,7 @@ var insts = {
 	var NOTE_TABLE = {'c':0,'d':2,'e':4,'f':5,'g':7,'a':9,'b':11};
 
 	var GM_RESET = String.fromCharCode(
-		0xF0, 0x7E, 0x7F, 0x09, 0x01, 0xF7	// GM Reset F0 7E 7F 09 01 F7
+		0x7E, 0x7F, 0x09, 0x01, 0xF7	// GM Reset F0 7E 7F 09 01 F7
 	);
 	
 	// 楽器セレクタ
@@ -65,10 +65,39 @@ var insts = {
 		html += '</select>'
 		return html;
 	}
-	/*
+	
+	// ランクを取得
+	function mml_rank( mml ) {
+		var ranks = [
+			[ "P", 200, 100, 0 ],
+			[ "F", 400, 200, 100 ],
+			[ "E", 500, 200, 100 ],
+			[ "D", 600, 250, 150 ],
+			[ "C", 650, 250, 200 ],
+			[ "B", 700, 300, 200 ],
+			[ "A", 750, 300, 200 ],
+			[ "9", 800, 350, 200 ],
+			[ "8", 850, 400, 200 ],
+			[ "7", 900, 400, 200 ],
+			[ "6", 950, 450, 200 ],
+			[ "5", 1000, 500, 250 ],
+			[ "4", 1050, 550, 300 ],
+			[ "3", 1100, 600, 350 ],
+			[ "2", 1150, 700, 400 ],
+			[ "1", 1200, 800, 500 ]
+		];
+		for( var i = 0; i < ranks.length; i++ ){
+			var r = ranks[i];
+			if( r[1] >= mml[0].length && r[2] >= mml[1].length && r[3] >= mml[2].length ){
+				return '<span title="Melody: '+mml[0].length + ' / Chord1: '+mml[1].length+' / Chord2: '+mml[2].length+'">Rank: '+r[0]+'</span>';
+			}
+		}
+		return "-";
+	}
+	// マスタートラック
 	function genMasterTrack(){
 		var part_msgs = [
-			{'time' : 0, 'msg' : String.fromCharCode(0xF0)+mml_getBytes(GM_RESET) + GM_RESET + String.fromCharCode(0xF7) },
+			{'time' : 0, 'msg' : String.fromCharCode(0xF0) + GM_RESET + String.fromCharCode(0xF7) },
 			{'time' : 96, 'msg' : String.fromCharCode(0xff,0x51, 0x07, 0xa1, 0x20)},	// テンポ設定（デフォルト60000000/120 = 500000）
 			{'time' : 368 , 'msg' : String.fromCharCode(0xff , 0x2f, 0x00)}	// Meta TrkEnd
 		];
@@ -79,15 +108,18 @@ var insts = {
 			last_time = part_msgs[mmid].time;
 			track_data += mml_writeVarLen(dt) + part_msgs[mmid].msg;
 		}
+		
 		var ret = 
 			TRACK_START +	// MTrk
-			mml_getBytes(track_data.length,4) +	// Block Length
-			track_data +						// Midi data
+			mml_getBytes(track_data.length,4) +// Block Length
+			track_data 							// Midi data
 			TRACK_END;		// Trk End
 		;
 		return ret;
 	}
-	*/
+	
+	
+	// トラックごとの処理
 	function genTrack(mml, chid, inst, pan, effect, Min, Max){
 		var isDrum = (Min == Max) ? true : false;
 		var cLength = dLength;
@@ -256,32 +288,53 @@ var insts = {
 
 	// MML>MIDI変換コアルーチン
 	function mabimml_genmidi(param) {
-		// param.inst midi楽器番号(0-127)
-		// param.mml mml文字列の配列
 		var nMin = 16, nMax = 88;
-
-		if (param.min || param.max){
-			nMin = param.min;
-			nMax = param.max;
-		}
-		var inst = (param.inst && param.inst >= 0 && param.inst < 128) ? Math.round(param.inst) : 0;
-		var pan = (param.pan && param.pan >= 0 && param.pan < 128) ? Math.round(param.pan) : 64;
-		var effect = (param.effect && param.effect >= 0 && param.effect < 128) ? Math.round(param.effect) : 40;
-
-		var ret = String.fromCharCode(
-			0x4D, 0x54, 0x68, 0x64,		// chunk ID "MThd"
-			0x00, 0x00, 0x00, 0x06,		// chunk size
-			0x01, 0x00,					// format type (Midi format1)
-			0x00, param.mml.length,		// number of tracks
-			0x00, dLength				// ticks per beat
-		);
+		var tracks = 0;
+		var ret ='';
 		// Master Track
 		//ret += genMasterTrack();
-		for(var part = 0; part < param.mml.length; part++) {	// パートごとに処理
-			ret += genTrack(param.mml[part], part, inst, pan, effect, nMin, nMax);
+		
+		// 直下にmmlパラメータが存在するかで、単一楽器用かどうかを判定する
+		if (param.mml){
+			if (param.min || param.max){
+				nMin = param.min;
+				nMax = param.max;
+			}
+			var inst = (param.inst && param.inst >= 0 && param.inst < 128) ? Math.round(param.inst) : 0;
+			var pan = (param.pan && param.pan >= 0 && param.pan < 128) ? Math.round(param.pan) : 64;
+			var effect = (param.effect && param.effect >= 0 && param.effect < 128) ? Math.round(param.effect) : 40;
+
+			for(var part = 0; part < param.mml.length; part++) {	// パートごとに処理
+				ret += genTrack(param.mml[part], part, inst, pan, effect, nMin, nMax);
+				tracks++;
+			}
+		}else if (typeof(param) === 'object'){
+			// 合奏用
+			for (var i = 0; i < param.length; i ++) {	// iの値はパート用番号として流用
+				var p = param[i];
+				if (p.min || p.max){
+					nMin = p.min;
+					nMax = p.max;
+				}
+				var inst = (p.inst && p.inst >= 0 && p.inst < 128) ? Math.round(p.inst) : 0;
+				var pan = (p.pan && p.pan >= 0 && p.pan < 128) ? Math.round(p.pan) : 64;
+				var effect = (p.effect && p.effect >= 0 && p.effect < 128) ? Math.round(p.effect) : 40;
+				for(var part = 0; part < p.mml.length; part++) {
+					ret += genTrack(p.mml[part], i, inst, pan, effect, nMin, nMax);
+					tracks++;
+				}
+			}
 		}
-		// dataを返す
-		return ret;
+		// ヘッダーとともに内容を返す
+		return 'data:audio/midi;base64,'+base64encode(
+			String.fromCharCode(
+				0x4D, 0x54, 0x68, 0x64,		// chunk ID "MThd"
+				0x00, 0x00, 0x00, 0x06,		// chunk size
+				0x01, 0x00,					// format type (Midi format1)
+				0x00, tracks,				// number of tracks
+				0x00, dLength				// ticks per beat
+			) + ret
+		);
 	}
 
 	//// Utilities
@@ -314,7 +367,7 @@ var insts = {
 		if (typeof(ret) !=='object'){
 			return false;
 		}else{
-			ret.shift();
+			ret.shift();	// 一番先頭の配列は削除
 			return ret;
 		}
 	}
@@ -349,39 +402,19 @@ var insts = {
 		}
 	}
 	
-	function mml_player(param){
-		var isMSIE = /*@cc_on!@*/false;
-		var url;
-		if (!isMSIE) {
-			url = 'data:audio/midi;base64,'+base64encode(mabimml_genmidi(param) );
-		}else{
-			url = 'http://comp.mabinogi.jp/PSGConverter.exe? /i'+param.inst+ ' ' + encodeURIComponent(param.mml);
-			// url = 'PSGConverter.php?i='+param.inst+ '&amp;p='+ param.pan+'&amp;e='+param.effect+'&amp;s=' + encodeURIComponent(param.mml);
-		}
-		var ensemble = (param.group !== 0) ? true : false;
-		console.log();
+	function mml_player(url, ensemble){
 		return [
-			(param.debug ? '<a class="btn btn-small mml-debug" href="'+url+'">debug.mid</a>' : ''),
-			(ensemble ? 
-				'<button class="btn btn-mini ensemble-rewind" data-playgroup="'+param.group+'">Rewind</button>' + 
-				'<button class="btn btn-mini btn-primary ensemble-play" data-playgroup="'+param.group+'">Play</button>' + 
-				'<button class="btn btn-mini btn-danger btn ensemble-pause" data-playgroup="'+param.group+'" style="display:none;">Pause</button>' : ''),
-			(typeof(ZeroClipboard) !== 'undefined' && location.protocol !=='file:' ) ? '<button id="mmlcopy'+param.id+'" class="btn btn-mini btn-info mml-copy" data-str="'+('MML@'+param.mml[0]+','+param.mml[1]+','+param.mml[2]+';')+'">Copy</button>' : '',
-			'<div class="mml-player" data-group="'+param.group+'">',
-				'<object type="audio/midi" ' + 
-						( ensemble ? 'width="0" height="0" ' : 'width="240" height="16" ') +
-						( isMSIE ? 'classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab"' : 'data="'+url+'"' ) + '>',
-					'<param name="controller" value="'+ ( ensemble ? 'false' : 'true') +'" />',
-					'<param name="src" value="'+url+'" />',
-					'<param name="autoplay" value="false" />',
-					'<param name="pluginspage" value="http://www.apple.com/quicktime/download/" />',
-				'</object>',
-			'</div>'
-			
+			'<object type="audio/midi" width="1" height="1"' +
+					( ensemble ? 'data-group="'+ensemble+'" ' : ''),
+					( isMSIE ? 'classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab"' : 'data="'+url+'"' ) + '>',
+				'<param name="controller" value="false" />',
+				'<param name="src" value="'+url+'" />',
+				'<param name="autoplay" value="false" />',
+				'<param name="pluginspage" value="http://www.apple.com/quicktime/download/" />',
+			'</object>'
 		].join("\n");
-		
 	}
-	
+
 	function mml_genplayer(dom, count){
 		var self = dom;
 		var $this = $(dom);
@@ -409,7 +442,7 @@ var insts = {
 		
 		var mml = mml_sanitize($this.contents()[0].nodeValue);	// MML配列
 		if (mml === false){
-			$this.before('<p class="alert alert-error">Could not parse MML. Invalied format?</p>');
+			return '<p class="alert alert-error">Could not parse MML. Invalied format?</p>';
 		}else{
 			param.group  = data.group  ? data.group : 0;
 			param.debug  = data.debug  ? true : false;
@@ -418,45 +451,156 @@ var insts = {
 			param.mml    = mml;
 			param.id     = count;
 
-			$this.before(mml_player(param));
+			return mml_widget(param);
 		}
 	}
 
+
 	$(document).ready(function(){
 		var count = 0;
-		$('.mabimml').each(function(){
-			mml_genplayer(this, count);
-			count++;
-		});
-		if (typeof(ZeroClipboard) !== 'undefined' && location.protocol !=='file:' ){
-			ZeroClipboard.setMoviePath('http://logue.github.com/PSGConverter/js/ZeroClipboard/ZeroClipboard.swf');
-			$('.mml-copy').each(function(){
-				var clip = new ZeroClipboard.Client();
-				clip.setText($(this).attr('data-str'));
-				clip.glue($(this).attr('id'));
+		var ensemble_params = {};
+
+		if (isMSIE){
+			// MSIEはChrome Frameで逃げる
+			$.getScript('http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js',function(){
+				CFInstall.check({
+					mode: 'overlay'
+				});
 			});
 		}
-		$('.ensemble-rewind').click(function(){
-			var group = $(this).data().playgroup;
-			$('*[data-group='+group+'] object').each(function(){
-				$(this)[0].Rewind();
-			});
+		
+		$('.mabimml').each(function(){
+			var $this = $(this);
+			var data = $this.data();
+			var param = {};
+			
+			var mml = mml_sanitize($this.contents()[0].nodeValue);	// MML配列
+			if (mml === false){
+				$this.before('<p class="alert alert-error">Could not parse MML. Invalied format?</p>');
+			}else{
+				if (data.instName !== '' && insts[data.instName] ){
+					param = {
+						inst_name : data.instName,
+						inst : insts[data.instName].inst,
+						max  : insts[data.instName].max,
+						min  : insts[data.instName].min
+					};
+				}else if (data.inst !== ''){
+					for (var name in insts) {
+						if (insts[name].inst = data.inst){
+							param = {
+								inst_name : name,
+								inst : insts[name].inst,
+								max  : insts[name].max,
+								min  : insts[name].min
+							};
+							break;
+						}
+					}
+				}
+				param.group  = data.group  ? data.group : 0;
+				param.debug  = data.debug  ? true : false;
+				param.pan    = data.pan    ? data.pan : 64;
+				param.effect = data.effect ? data.effect : 40;
+				param.mml    = mml;
+				param.id     = count;
+				
+				var mml_url = (!isMSIE) ? mabimml_genmidi(param) : 
+					'http://comp.mabinogi.jp/PSGConverter.exe? /i'+param.inst+ ' ' + encodeURIComponent(param.mml[0]+','+param.mml[1]+','+param.mml[2]);
+				
+				// MMLの書かれているタグを外からmml-playerクラスでくくる
+				$this.wrapAll([
+					'<fieldset class="mml-player" '+(param.group !==0 ? 'data-group="'+param.group +'" ' : '')+'>',
+						($this.attr('title') ?
+							 '<legend>'+$this.attr('title')+' <span class="label">('+mml_rank(mml)+' / Instrument: '+param.inst_name+')</span></legend>' :
+							'<span class="label">'+mml_rank(mml)+' / Instrument : '+ param.inst_name + '</span>'
+						),
+						(param.debug ? '<legend class="mml-debug btn btn-small btn-warning" href="'+url+'">debug.mid</a>' : ''),
+						'<button class="mml-rewind btn btn-mini">Rewind</button>',
+						'<button class="mml-play btn btn-mini btn-primary">Play</button>',
+						'<button class="mml-pause btn btn-mini btn-danger" style="display:none;">Pause</button>',
+						'<button class="mml-copy btn btn-mini btn-info" id="__mmlcopy'+param.id+'" data-str="'+('MML@'+param.mml[0]+','+param.mml[1]+','+param.mml[2]+';')+'">Copy</button>',
+						mml_player(mml_url),
+					'</fieldset>'
+				].join("\n"));
+
+				// 外からくくっているため、イベント割り当て処理が煩雑に
+				var $self = $this.parent();
+				var obj = $self.children('object')[0];
+				var $play = $self.children('.mml-play');
+				var $stop = $self.children('.mml-pause');
+
+				$self.children('.mml-rewind',this).click(function(){
+					obj.Rewind();
+				});
+				$play.click(function(){
+					obj.Play();
+					$(this).css({'display':'none'});
+					$stop.css({'display':'inline-block'});
+				});
+				$stop.click(function(){
+					obj.Stop();
+					$(this).css({'display':'none'});
+					$play.css({'display':'inline-block'});
+				});
+				
+				// 合奏用にMMLをキャッシュ
+				if (param.group){
+					try{
+						ensemble_params[param.group].push(param);
+					}catch(e){
+						ensemble_params[param.group] = [];
+						ensemble_params[param.group].push(param);
+					}
+				}
+			}
+			count++;
 		});
-		$('.ensemble-play').click(function(){
-			var group = $(this).data().playgroup;
-			$('*[data-group='+group+'] object').each(function(){
-				$(this)[0].Play();
+		
+		if (!isMSIE){
+			// キャッシュされたMML合奏用プレイヤーの作成
+			for (var group in ensemble_params) {
+				$('body').append(mml_player(mabimml_genmidi(ensemble_params[group]),group));
+				var obj = $('object[data-group='+group+']')[0];
+				$('.mml-player[data-group='+group+']').each(function(){
+					var $this = $('.mml-copy',this);
+					$this.after(
+						'<button class="mml-ensumble-rewind btn btn-mini">Ensumble Rewind</button>' +
+						'<button class="mml-ensumble-play btn btn-mini btn-success">Ensumble Play</button>' +
+						'<button class="mml-ensumble-pause btn btn-mini btn-danger" style="display:none;">Ensumble Pause</button>'
+					);
+				});
+				var $play = $('*[data-group='+group+'] .mml-ensumble-play');
+				var $stop = $('*[data-group='+group+'] .mml-ensumble-pause');
+				var $rewind = $('*[data-group='+group+'] .mml-ensumble-rewind');
+
+				$rewind.click(function(){
+					obj.Rewind();
+				});
+				$play.click(function(){
+					obj.Play();
+					$play.css({'display':'none'});
+					$stop.css({'display':'inline-block'});
+				});
+				$stop.click(function(){
+					obj.Stop();
+					$stop.css({'display':'none'});
+					$play.css({'display':'inline-block'});
+				});
+			}
+		}
+
+		if (location.protocol !== 'file:'){
+			$.getScript('http://logue.github.com/PSGConverter/js/ZeroClipboard/ZeroClipboard.js',function(){
+				ZeroClipboard.setMoviePath('http://logue.github.com/PSGConverter/js/ZeroClipboard/ZeroClipboard.swf');
+				$('.mml-copy').each(function(){
+					var $this = $(this);
+					$this.css({'display':'inline-block'});
+					var clip = new ZeroClipboard.Client();
+					clip.setText($this.attr('data-str'));
+					clip.glue($this.attr('id'));
+				});
 			});
-			$('.ensemble-play[data-playgroup='+group+']').css({'display':'none'});
-			$('.ensemble-pause[data-playgroup='+group+']').css({'display':'inline'});
-		});
-		$('.ensemble-pause').click(function(){
-			var group = $(this).data().playgroup;
-			$('*[data-group='+group+'] object').each(function(){
-				$(this)[0].Stop();
-			});
-			$('.ensemble-play[data-playgroup='+group+']').css({'display':'inline'});
-			$('.ensemble-pause[data-playgroup='+group+']').css({'display':'none'});
-		});
+		}
 	});
 })(jQuery);
