@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title>PSGConverter</title>
+		<meta http-equiv="X-UA-Compatible" content="chrome=1">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta name="description" content="Mabinogi MML Web Player for JavaScript.">
 		<meta name="author" content="Logue">
@@ -97,6 +98,10 @@ body {
 								</tr>
 							</thead>
 							<tbody>
+								<tr>
+									<td><code>title</code></td>
+									<td>Title of MML.</td>
+								</tr>
 								<tr>
 									<td><code>data-inst</code></td>
 									<td>GM Instrument Number</td>
@@ -223,10 +228,11 @@ body {
 			
 			<section id="example">
 				<h2>Example</h2>
+				<p>Notice: These sample does not works copy to clipboard feature for ZeroClipboard limitation.</p>
 				<h3>Basic [Lemmings Tim2]</h3>
 				<ul class="nav nav-tabs">
-					<li class="active"><a href="#source" data-toggle="tab">HTML Source</a></li>
-					<li><a href="#sample" data-toggle="tab">Sample</a></li>
+					<li class="tab-pane" class="active"><a href="#source" data-toggle="tab">HTML Source</a></li>
+					<li class="tab-pane"><a href="#sample" data-toggle="tab">Sample</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="source">
@@ -246,7 +252,7 @@ l1.rrrrrrv15&lt;f2l4.ag1c8a2b+g1r8f2ag1c8a2&gt;cl1dr8erel8ro2gagagab+cr&gt;cr&lt
 				</div>
 
 				<h3>Ensemble example [Rufus Welcoming Ceremony / Final Fantasy 7]</h3>
-				<p>This program also support Ensemble emulation.</p>
+				<p>This program also support ensemble emulation.</p>
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#e-source" data-toggle="tab">HTML Source</a></li>
 					<li><a href="#e-sample" data-toggle="tab">Sample</a></li>
@@ -278,7 +284,7 @@ t120l64o2a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp
 ;&lt;/pre&gt;</pre>
 			
 					</div>
-					<div class="tab-pane" id="e-sample">
+					<div  class="tab-pane" id="e-sample">
 						<div class="row">
 							<div class="span6">
 								<pre class="mabimml" title="Rufus Welcoming Ceremony (Chalumeau)" data-inst-name="Chalumeau" data-pan="32" data-group="1">MML@
@@ -330,7 +336,6 @@ r;</pre>
 		<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="js/google-code-prettify/prettify.js"></script>
-		<script type="text/javascript" src="js/ZeroClipboard/ZeroClipboard.js"></script>
 		<script type="text/javascript" src="js/PSGConverter.js"></script>
 		<script type="text/javascript">/*<![CDATA[*/
 $(document).ready(function(){
