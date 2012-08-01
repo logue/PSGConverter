@@ -481,6 +481,7 @@
 	$(document).ready(function(){
 		var count = 0;
 		var ensemble_params = {};
+		$("head").append('<link rel="stylesheet" href="http://logue.github.com/PSGConverter/css/PSGConverter.min.css" />');
 
 		if (isMSIE){
 			// MSIEはChrome Frameで逃げる
