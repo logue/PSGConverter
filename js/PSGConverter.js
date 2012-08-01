@@ -25,16 +25,16 @@
 		'Lute':			{inst: 24,  max: 88, min: 16},	// 25.  Acoustic Guitar (nylon)
 		'Ukulele':		{inst: 28,  max: 88, min: 16},	// 29.  Electric Guitar (muted)
 		'Mandorin':		{inst: 105, max: 88, min: 16},	// 106. Banjo
-		'Whistle':		{inst: 78,  max: 88, min: 60},	// 79.  Whistle
+		'Whistle':		{inst: 72,  max: 88, min: 60},	// 73.  Piccolo
 		'Flute':		{inst: 73,  max: 83, min: 48},	// 74.  Flute
 		'Roncadora':	{inst: 77,  max: 83, min: 48},	// 78.  Shakuhachi
 		'Chalumeau':	{inst: 71,  max: 59, min: 24},	// 72.  Clarinet
 		'Tuba':			{inst: 58,  max: 59, min: 24},	// 59.  Tuba
 		'Lyre':			{inst: 46,  max: 88, min: 16},	// 47.  Orchestral Harp
-		'Snare':		{inst: 1,  max: 38, min: 38},	// Drum Part
-		'Drum':			{inst: 1,  max: 40, min: 40},
-		'Bass Drum':	{inst: 1,  max: 36, min: 36},
-		'Cymbal':		{inst: 1,  max: 49, min: 49},
+		'Snare':		{inst: 48,  max: 38, min: 38},	// 48.  Orchestra Kit (Concert SD)
+		'Drum':			{inst: 48,  max: 40, min: 40},	// 48.  Orchestra Kit (Concert SD)
+		'Bass Drum':	{inst: 48,  max: 35, min: 35},	// 48.  Orchestra Kit (Gran Casa)
+		'Cymbal':		{inst: 48,  max: 57, min: 57},	// 48.  Orchestra Kit (Hand Cymbal)
 		'Xylophone':	{inst: 14,  max: 88, min: 16}	// 14.  Xylophone
 	};
 	
@@ -88,6 +88,9 @@
 		];
 		for( var i = 0; i < ranks.length; i++ ){
 			var r = ranks[i];
+			if (typeof(mml[0]) == 'undefined') mml[0] = '';
+			if (typeof(mml[1]) == 'undefined') mml[1] = '';
+			if (typeof(mml[2]) == 'undefined') mml[2] = '';
 			if( r[1] >= mml[0].length && r[2] >= mml[1].length && r[3] >= mml[2].length ){
 				return '<span title="Melody: '+mml[0].length + ' / Chord1: '+mml[1].length+' / Chord2: '+mml[2].length+'">Rank: '+r[0]+'</span>';
 			}
@@ -303,10 +306,19 @@
 			var inst = (param.inst && param.inst >= 0 && param.inst < 128) ? Math.round(param.inst) : 0;
 			var pan = (param.pan && param.pan >= 0 && param.pan < 128) ? Math.round(param.pan) : 64;
 			var effect = (param.effect && param.effect >= 0 && param.effect < 128) ? Math.round(param.effect) : 40;
-
-			for(var part = 0; part < param.mml.length; part++) {	// パートごとに処理
-				ret += genTrack(param.mml[part], part, inst, pan, effect, nMin, nMax);
-				tracks++;
+			
+			if (nMin == nMax){
+				// ドラムの場合、メロディ→和音１→和音２という順にMMLが再生される。
+				var d_mml = '';
+				for(var part = 0; part < param.mml.length; part++) {	// パートごとに処理
+					d_mml += param.mml[part];
+				}
+				ret += genTrack(d_mml, part, inst, pan, effect, nMin, nMax);
+			}else{
+				for(var part = 0; part < param.mml.length; part++) {	// パートごとに処理
+					ret += genTrack(param.mml[part], part, inst, pan, effect, nMin, nMax);
+					tracks++;
+				}
 			}
 		}else if (typeof(param) === 'object'){
 			// 合奏用
@@ -319,9 +331,19 @@
 				var inst = (p.inst && p.inst >= 0 && p.inst < 128) ? Math.round(p.inst) : 0;
 				var pan = (p.pan && p.pan >= 0 && p.pan < 128) ? Math.round(p.pan) : 64;
 				var effect = (p.effect && p.effect >= 0 && p.effect < 128) ? Math.round(p.effect) : 40;
-				for(var part = 0; part < p.mml.length; part++) {
-					ret += genTrack(p.mml[part], i, inst, pan, effect, nMin, nMax);
-					tracks++;
+				
+				if (nMin == nMax){
+					// ドラムの場合、メロディ→和音１→和音２という順にMMLが再生される。
+					var d_mml = '';
+					for(var part = 0; part < p.mml.length; part++) {	// パートごとに処理
+						d_mml += p.mml[part];
+					}
+					ret += genTrack(d_mml, part, inst, pan, effect, nMin, nMax);
+				}else{
+					for(var part = 0; part < p.mml.length; part++) {
+						ret += genTrack(p.mml[part], i, inst, pan, effect, nMin, nMax);
+						tracks++;
+					}
 				}
 			}
 		}
@@ -363,7 +385,7 @@
 	//MMLを正規化
 	function mml_sanitize(str) {
 		var mml = str.replace(/\r\n|\n\r|\n|\r|\s|/g, '');	// Remove line break and space
-		var ret = mml.match(/MML\@([0-9A-GLNORTV#<>.&+-]*?),([0-9A-GLNORTV#<>.&+-]*?),([0-9A-GLNORTV#<>.&+-]*?);/i);
+		var ret = mml.match(/MML\@([0-9A-GLNORTV#<>.&+-]*?)?,([0-9A-GLNORTV#<>.&+-]*?)?,([0-9A-GLNORTV#<>.&+-]*?)?;/i);
 		if (typeof(ret) !=='object'){
 			return false;
 		}else{
@@ -508,12 +530,14 @@
 				var mml_url = (!isMSIE) ? mabimml_genmidi(param) : 
 					'http://comp.mabinogi.jp/PSGConverter.exe? /i'+param.inst+ ' ' + encodeURIComponent(param.mml[0]+','+param.mml[1]+','+param.mml[2]);
 				
+				var tag = $this.attr('title') ? 'fieldset' : 'div';
+				
 				// MMLの書かれているタグを外からmml-playerクラスでくくる
 				$this.wrapAll([
-					'<fieldset class="mml-player" '+(param.group !==0 ? 'data-group="'+param.group +'" ' : '')+'>',
+					'<'+tag+' class="mml-player" '+(param.group !==0 ? 'data-group="'+param.group +'" ' : '')+'>',
 						($this.attr('title') ?
-							 '<legend>'+$this.attr('title')+' <span class="label">('+mml_rank(mml)+' / Instrument: '+param.inst_name+')</span></legend>' :
-							'<span class="label">'+mml_rank(mml)+' / Instrument : '+ param.inst_name + '</span>'
+							'<legend>'+$this.attr('title')+' <span class="label">'+mml_rank(mml)+'</span>  <span class="label">Instrument: '+param.inst_name+'</span></legend>' :
+							'<span class="label">'+mml_rank(mml)+'</span>  <span class="label">Instrument : '+ param.inst_name + '</span>'
 						),
 						(param.debug ? '<legend class="mml-debug btn btn-small btn-warning" href="'+url+'">debug.mid</a>' : ''),
 						'<button class="mml-rewind btn btn-mini">Rewind</button>',
@@ -521,7 +545,7 @@
 						'<button class="mml-pause btn btn-mini btn-danger" style="display:none;">Pause</button>',
 						'<button class="mml-copy btn btn-mini btn-info" id="__mmlcopy'+param.id+'" data-str="'+('MML@'+param.mml[0]+','+param.mml[1]+','+param.mml[2]+';')+'">Copy</button>',
 						mml_player(mml_url),
-					'</fieldset>'
+					'</'+tag+'>'
 				].join("\n"));
 
 				// 外からくくっているため、イベント割り当て処理が煩雑に
