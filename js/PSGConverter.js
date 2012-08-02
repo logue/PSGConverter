@@ -47,6 +47,14 @@
 			'Chord1'	: 'Chord 1',
 			'Chord2'	: 'Chord 2',
 			
+			'rewind'	: 'Rewind',
+			'play'		: 'Play',
+			'pause'		: 'Pause',
+			'copy'		: 'Copy',
+			'e_rewind'	: 'Rewind (Ensemble)',
+			'e_play'	: 'Play (Ensemble)',
+			'e_pause'	: 'Pause (Ensemble)',
+			
 			'Lute'		: 'Lute',
 			'Ukulele'	: 'Ukulele', 
 			'Mandorin'	: 'Mandorin', 
@@ -71,6 +79,14 @@
 =======
 			'Chord2'	: '和音２',
 >>>>>>> 408ef01... Fixed Xylophone is not assinged to 14.Xylophone
+			
+			'rewind'	: '巻き戻し',
+			'play'		: '再生',
+			'pause'		: '一時停止',
+			'copy'		: 'コピー',
+			'e_rewind'	: '巻き戻し（合奏）',
+			'e_play'	: '再生（合奏）',
+			'e_pause'	: '一時停止（合奏）',
 			
 			'Lute'		: 'リュート',
 			'Ukulele'	: 'ウクレレ',
@@ -143,7 +159,7 @@
 			if (typeof(mml[1]) == 'undefined') mml[1] = '';
 			if (typeof(mml[2]) == 'undefined') mml[2] = '';
 			if( r[1] >= mml[0].length && r[2] >= mml[1].length && r[3] >= mml[2].length ){
-				return '<span title="Melody: '+mml[0].length + ' / Chord1: '+mml[1].length+' / Chord2: '+mml[2].length+'">Rank: '+r[0]+'</span>';
+				return '<span title="'+message('Melody')+ ': '+mml[0].length + ' / '+message('Chord1')+ ': '+mml[1].length+' / '+message('Chord2')+ ': '+mml[2].length+'">'+message('Rank')+ ': '+r[0]+'</span>';
 			}
 		}
 		return "-";
@@ -436,7 +452,7 @@
 	//MMLを正規化
 	function mml_sanitize(str) {
 		var mml = str.replace(/\r\n|\n\r|\n|\r|\s|/g, '');	// Remove line break and space
-		var ret = mml.match(/MML\@([0-9A-GLNORTV#<>.&+-]*?)?,([0-9A-GLNORTV#<>.&+-]*?)?,([0-9A-GLNORTV#<>.&+-]*?)?;/i);
+		var ret = mml.match(/MML\@([0-9A-GLNORTV#<>.&+-]*),([0-9A-GLNORTV#<>.&+-]*),([0-9A-GLNORTV#<>.&+-]*);/i);
 		if (typeof(ret) !=='object'){
 			return false;
 		}else{
@@ -588,14 +604,14 @@
 				$this.wrapAll([
 					'<'+tag+' class="mml-player" '+(param.group !==0 ? 'data-group="'+param.group +'" ' : '')+'>',
 						($this.attr('title') ?
-							'<legend>'+$this.attr('title')+' <span class="label">'+mml_rank(mml)+'</span>  <span class="label">Instrument: '+param.inst_name+'</span></legend>' :
-							'<span class="label">'+mml_rank(mml)+'</span>  <span class="label">Instrument : '+ param.inst_name + '</span>'
+							'<legend>'+$this.attr('title')+' <span class="label">'+mml_rank(mml)+'</span>  <span class="label label-info">'+message('Inst')+ ': '+message(param.inst_name)+'</span></legend>' :
+							'<span class="label">'+mml_rank(mml)+'</span>  <span class="label label-info">'+message('Inst')+ ': '+ message(param.inst_name) + '</span>'
 						),
 						(param.debug ? '<legend class="mml-debug btn btn-small btn-warning" href="'+url+'">debug.mid</a>' : ''),
-						'<button class="mml-rewind btn btn-mini">Rewind</button>',
-						'<button class="mml-play btn btn-mini btn-primary">Play</button>',
-						'<button class="mml-pause btn btn-mini btn-danger" style="display:none;">Pause</button>',
-						'<button class="mml-copy btn btn-mini btn-info" id="__mmlcopy'+param.id+'" data-str="'+('MML@'+param.mml[0]+','+param.mml[1]+','+param.mml[2]+';')+'">Copy</button>',
+						'<button class="mml-rewind btn btn-mini">'+message('rewind')+ '</button>',
+						'<button class="mml-play btn btn-mini btn-primary">'+message('play')+ '</button>',
+						'<button class="mml-pause btn btn-mini btn-danger" style="display:none;">'+message('pause')+ '</button>',
+						'<button class="mml-copy btn btn-mini btn-info" id="__mmlcopy'+param.id+'" data-str="'+('MML@'+param.mml[0]+','+param.mml[1]+','+param.mml[2]+';')+'">'+message('copy')+ '</button>',
 						mml_player(mml_url),
 					'</'+tag+'>'
 				].join("\n"));
@@ -641,9 +657,9 @@
 				$('.mml-player[data-group='+group+']').each(function(){
 					var $this = $('.mml-copy',this);
 					$this.after(
-						'<button class="mml-ensumble-rewind btn btn-mini">Ensumble Rewind</button>' +
-						'<button class="mml-ensumble-play btn btn-mini btn-success">Ensumble Play</button>' +
-						'<button class="mml-ensumble-pause btn btn-mini btn-danger" style="display:none;">Ensumble Pause</button>'
+						'<button class="mml-ensumble-rewind btn btn-mini">'+message('e_rewind')+ '</button>' +
+						'<button class="mml-ensumble-play btn btn-mini btn-success">'+message('e_play')+ '</button>' +
+						'<button class="mml-ensumble-pause btn btn-mini btn-danger" style="display:none;">'+message('e_pause')+ '</button>'
 					);
 				});
 				var $play = $('*[data-group='+group+'] .mml-ensumble-play');
