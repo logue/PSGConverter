@@ -66,7 +66,11 @@
 			'Inst'		: '楽器',
 			'Melody'	: 'メロディ',
 			'Chord1'	: '和音１',
+<<<<<<< HEAD
 			'Chord2'	: '和音２'
+=======
+			'Chord2'	: '和音２',
+>>>>>>> 408ef01... Fixed Xylophone is not assinged to 14.Xylophone
 			
 			'Lute'		: 'リュート',
 			'Ukulele'	: 'ウクレレ',
