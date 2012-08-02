@@ -18,8 +18,9 @@
  */
 
 // Based On えむえる
-(function($){
+(function ($, window, document) {
 	var isMSIE = /*@cc_on!@*/false;
+	var locale = (navigator.userLanguage||navigator.browserLanguage||navigator.language).substr(0,2);
 
 	var insts = {
 		'Lute':			{inst: 24,  max: 88, min: 16},	// 25.  Acoustic Guitar (nylon)
@@ -31,12 +32,58 @@
 		'Chalumeau':	{inst: 71,  max: 59, min: 24},	// 72.  Clarinet
 		'Tuba':			{inst: 58,  max: 59, min: 24},	// 59.  Tuba
 		'Lyre':			{inst: 46,  max: 88, min: 16},	// 47.  Orchestral Harp
-		'Snare':		{inst: 48,  max: 38, min: 38},	// 48.  Orchestra Kit (Concert SD)
-		'Drum':			{inst: 48,  max: 40, min: 40},	// 48.  Orchestra Kit (Concert SD)
-		'Bass Drum':	{inst: 48,  max: 35, min: 35},	// 48.  Orchestra Kit (Gran Casa)
-		'Cymbal':		{inst: 48,  max: 57, min: 57},	// 48.  Orchestra Kit (Hand Cymbal)
-		'Xylophone':	{inst: 14,  max: 88, min: 16}	// 14.  Xylophone
+		'Snare':		{inst: 48,  max: 38, min: 38},	// 49.  Orchestra Kit (Concert SD)
+		'Drum':			{inst: 48,  max: 40, min: 40},	// 49.  Orchestra Kit (Concert SD)
+		'Bass Drum':	{inst: 48,  max: 35, min: 35},	// 49.  Orchestra Kit (Gran Casa)
+		'Cymbal':		{inst: 48,  max: 57, min: 57},	// 49.  Orchestra Kit (Hand Cymbal)
+		'Xylophone':	{inst: 15,  max: 88, min: 16}	// 14.  Xylophone
 	};
+	
+	var messages = {
+		'en' : {
+			'Rank'		: 'Rank',
+			'Inst'		: 'Instrument',
+			'Melody'	: 'Melody',
+			'Chord1'	: 'Chord 1',
+			'Chord2'	: 'Chord 2',
+			
+			'Lute'		: 'Lute',
+			'Ukulele'	: 'Ukulele', 
+			'Mandorin'	: 'Mandorin', 
+			'Flute'		: 'Flute',
+			'Roncadora'	: 'Roncadora',
+			'Chalumeau'	: 'Chalumeau',
+			'Tuba'		: 'Tuba',
+			'Lyre'		: 'Lyre',
+			'Snare'		: 'Snare',
+			'Drum'		: 'Drum',
+			'Bass Drum'	: 'Bass Drum',
+			'Cymbal'	: 'Cymbal',
+			'Xylophone'	: 'Xylophone'
+		},
+		ja : {
+			'Rank'		: 'ランク',
+			'Inst'		: '楽器',
+			'Melody'	: 'メロディ',
+			'Chord1'	: '和音１',
+			'Chord2'	: '和音２'
+			
+			'Lute'		: 'リュート',
+			'Ukulele'	: 'ウクレレ',
+			'Mandorin'	: 'マンドリン',
+			'Flute'		: 'フルート',
+			'Roncadora'	: 'ロンカドーラ',
+			'Chalumeau'	: 'シャリュモー',
+			'Tuba'		: 'チューバ',
+			'Lyre'		: 'リラ',
+			'Snare'		: 'スネア',
+			'Drum'		: '小太鼓',
+			'Bass Drum'	: '大太鼓',
+			'Cymbal'	: 'シンバル',
+			'Xylophone'	: 'シロフォン'
+		}
+	};
+	var message = function (str){ return (typeof messages[locale][str] == 'undefined') ? msg['en'][str] : messages[locale][str]; }
 	
 	var dLength = 96;	// = 1quarternote = 32tick
 	var Semibreve = dLength*4;	// 1小節
@@ -628,4 +675,4 @@
 			});
 		}
 	});
-})(jQuery);
+} )(jQuery, this, this.document );
