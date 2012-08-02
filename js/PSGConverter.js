@@ -58,6 +58,7 @@
 			'Lute'		: 'Lute',
 			'Ukulele'	: 'Ukulele', 
 			'Mandorin'	: 'Mandorin', 
+			'Whistle'	: 'Whistle',
 			'Flute'		: 'Flute',
 			'Roncadora'	: 'Roncadora',
 			'Chalumeau'	: 'Chalumeau',
@@ -87,6 +88,7 @@
 			'Lute'		: 'リュート',
 			'Ukulele'	: 'ウクレレ',
 			'Mandorin'	: 'マンドリン',
+			'Whistle'	: 'ホイッスル',
 			'Flute'		: 'フルート',
 			'Roncadora'	: 'ロンカドーラ',
 			'Chalumeau'	: 'シャリュモー',
@@ -97,9 +99,42 @@
 			'Bass Drum'	: '大太鼓',
 			'Cymbal'	: 'シンバル',
 			'Xylophone'	: 'シロフォン'
+		},
+		ko : {
+			'Lute'		: '류트',
+			'Ukulele'	: '우쿨렐레',
+			'Mandorin'	: '만돌린',
+			'Whistle'	: '휘슬',
+			'Flute'		: '플루트',
+			'Roncadora'	: '론카도라',
+			'Chalumeau'	: '샬루모',
+			'Tuba'		: '피시스 튜바',
+			'Lyre'		: 'Lyre',
+			'Snare'		: '스네어 드럼',
+			'Drum'		: '작은 북',
+			'Bass Drum'	: '큰 북',
+			'Cymbal'	: '심벌즈',
+			'Xylophone'	: 'Xylophone'
+		},
+		zh : {
+			'Lute'		: '鲁特琴',
+			'Ukulele'	: '夏威夷四弦琴',
+			'Mandorin'	: '曼陀林',
+			'Whistle'	: '短笛',
+			'Flute'		: '长笛',
+			'Roncadora'	: '哆啦',
+			'Chalumeau'	: '单簧管',
+			'Tuba'		: '大號',
+			'Lyre'		: 'Lyre',
+			'Snare'		: '军鼓',
+			'Drum'		: '小鼓',
+			'Bass Drum'	: '低音鼓',
+			'Cymbal'	: '钹',
+			'Xylophone'	: 'Xylophone'
 		}
+		
 	};
-	var message = function (str){ return (typeof messages[locale][str] == 'undefined') ? msg['en'][str] : messages[locale][str]; }
+	var message = function (str){ return (typeof messages[locale][str] == 'undefined') ? messages['en'][str] : messages[locale][str]; }
 	
 	var dLength = 96;	// = 1quarternote = 32tick
 	var Semibreve = dLength*4;	// 1小節
