@@ -62,9 +62,10 @@ body {
 		</div>
 
 		<div class="container">
-			<header class="jumbotron subhead" id="overview">
+			<div class="hero-unit">
 				<h1>PSGConverter.js</h1>
-				<p class="lead">PSGConverter is converter of Mabinogi MML to MIDI file script. This version is implemented by Javascript.</p>
+				<p class="lead">PSGConverter is converter of Mabinogi MML to MIDI file script. This version is implemented by JavaScript.
+				Since all processing is performed on the client side (No host midi file), you can embed MML to your site without violating the law.</p>
 				<p>
 					<a href="http://mabiassist.logue.be/PSGConverter" class="btn btn-large btn-info">Official Site</a>
 					<a href="http://forum.logue.be/index.php?topic=531.0" class="btn btn-large">Support Forum</a>
@@ -72,6 +73,8 @@ body {
 					<a href="./demo.html" class="btn btn-large">Demo</a>
 					<a href="https://github.com/logue/PSGConverter/downloads" class="btn btn-primary btn-large">Download</a>
 				</p>
+			</div>
+			<header class="jumbotron subhead" id="overview">
 				<div class="subnav">
 					<ul class="nav nav-pills">
 						<li><a href="#overview">Overview</a></li>
@@ -92,12 +95,15 @@ body {
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="install">
-						Insert the MML in the pre tag mabimml to put a class attribute.
+						<p>This program will playback using <a href="http://www.apple.com/quicktime/">QuickTime</a>. Insert the MML in the <code>pre</code> tag <code>mabimml</code> to put a class attribute.
 						<pre class="prettyprint">&lt;pre&nbsp;class=&quot;mabimml&quot;&nbsp;title=&quot;MML Name&quot;&nbsp;data-inst=&quot;105&quot;&gt; ... Insert valied Mabinogi MML ... &lt;/pre&gt;</pre>
-						Please insert the following script at the bottom of the page.
+						Please insert the following script at the <strong>bottom</strong> of the page. <a href="http://jquery.com/">jQuery</a> is if necessary.</p>
 						<pre class="prettyprint">
 &lt;script&nbsp;type=&quot;text/javascript&quot;&nbsp;src=&quot;http://code.jquery.com/jquery.min.js&quot;&gt;&lt;/script&gt;
 &lt;script&nbsp;type=&quot;text/javascript&quot;&nbsp;src=&quot;./PSGConverter.js&quot;&gt;&lt;/script&gt;</pre>
+						<p>And if you have a large user IE, please add the following line above the header part to read the scripts and CSS.</p>
+						<pre class="prettyprint">&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;chrome=1&quot;&gt;</pre>
+						<p class="alert alert-info">In IE, because it can not properly process the data scheme, drawn using <a href="http://www.google.com/chromeframe">Chrome Frame</a>.</p>
 					</div>
 					<div class="tab-pane" id="option">
 						<table class="table">
@@ -114,7 +120,7 @@ body {
 								</tr>
 								<tr>
 									<td><code>data-inst</code></td>
-									<td>GM Instrument Number</td>
+									<td>GM Instrument Mapping</td>
 								</tr>
 								<tr>
 									<td><code>data-inst-name</code></td>
@@ -122,7 +128,7 @@ body {
 								</tr>
 								<tr>
 									<td><code>data-pan</code></td>
-									<td>PanPod. default = 64 (center)</td>
+									<td>Specifies the orientation of the sound. default = 64 (center)</td>
 								</tr>
 								<tr>
 									<td><code>data-effect</code></td>
@@ -202,27 +208,27 @@ body {
 								</tr>
 								<tr>
 									<td>Snare</td>
-									<td></td>
-									<td></td>
-									<td></td>
+									<td>49, Orchestra Kit (Concert SD)</td>
+									<td>38</td>
+									<td>38</td>
 								</tr>
 								<tr>
 									<td>Drum</td>
-									<td></td>
-									<td></td>
-									<td></td>
+									<td>49, Orchestra Kit (Concert SD)</td>
+									<td>40</td>
+									<td>40</td>
 								</tr>
 								<tr>
 									<td>Bass Drum</td>
-									<td></td>
-									<td></td>
-									<td></td>
+									<td>49, Orchestra Kit (Concert SD)</td>
+									<td>35</td>
+									<td>35</td>
 								</tr>
 								<tr>
 									<td>Cymbal</td>
-									<td></td>
-									<td></td>
-									<td></td>
+									<td>49, Orchestra Kit (Hand Cymbal)</td>
+									<td>57</td>
+									<td>57</td>
 								</tr>
 								<tr>
 									<td>Xylophone</td>
@@ -232,6 +238,7 @@ body {
 								</tr>
 							</tbody>
 						</table>
+						<p class="alert alert-info">Scale is as same as the original. (Sounds in the same octave exceeds the limit value)</p>
 					</div>
 				</div>
 			</section>
@@ -351,37 +358,30 @@ t120l64o2a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp
 								<label class="control-label" for="inst">Instrument</label>
 								<div class="controls">
 									<select id="inst" class="span3">
-										<option>Lute</option>
-										<option>Ukulele</option>
-										<option>Mandorin</option>
-										<option>Whistle</option>
-										<option>Flute</option>
-										<option>Roncadora</option>
-										<option>Chalumeau</option>
-										<option>Tuba</option>
-										<option>Lyre</option>
-										<option>Snare</option>
-										<option>Drum</option>
-										<option>Bass Drum</option>
-										<option>Cymbal</option>
-										<option>Xylophone</option>
 									</select>
+									<p class="help-block">If there is a scale can not be played back, the color will change.</p>
 								</div>
 							</div>
 							<div class="control-group">
 								<label class="control-label" for="pan">Panpod</label>
 								<div class="controls">
 									<input type="number" id="pan" placeholder="64" value="64" max="127" min="0" class="span2" />
-									<p class="help-block">Left is 0, center is 64, Right is 127.</p>
+									<div class="progress progress-success" id="bar_pan"><div class="bar" style="width: 50%;"></div></div>
+									<p class="help-block"><span class="label label-info">Left</span> is 0, <span class="label label-success">Center</span> is 64, <span class="label label-important">Right</span> is 127.</p>
 								</div>
 							</div>
 							<div class="control-group">
 								<label class="control-label" for="effect">Effect depth</label>
 								<div class="controls">
 									<input type="number" id="effect" placeholder="40" value="40" max="127" min="0" class="span2" />
+									<div class="progress progress-warning" id="bar_effect"><div class="bar" style="width: 30%;"></div></div>
 									<p class="help-block">default is 40.</p>
 								</div>
 							</div>
+						</div>
+					</div>
+					<div class="span6">
+						<div class="form-horizontal">
 							<div class="control-group">
 								<label class="control-label" for="effect">Ensemble Group</label>
 								<div class="controls">
@@ -390,16 +390,17 @@ t120l64o2a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="span6">
 						<div class="control-group">
-							<label class="control-label" for="mml">MML <span id="rank"></span></label>
+							<label class="control-label" for="mml">MML</label>
 							<div class="controls">
-								<textarea id="mml" rows="3" placeholder="MML" class="mml"></textarea>
+								<textarea id="mml" rows="3" style="width:98%;" placeholder="MML@....,....,...;" class="mml"></textarea>
+								<p class="help-block" id="rank"></p>
 							</div>
 						</div>
+						
 						<div class="form-actions">
 							<button id="execute" class="btn btn-primary">Generate HTML embed code</button>
+							<button id="pukiwiki" class="btn">Generate PukiWiki code</button>
 						</div>
 					</div>
 				</div>
@@ -407,7 +408,7 @@ t120l64o2a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp
 				<div class="control-group">
 					<label class="control-label" for="code">Output HTML code </label>
 					<div class="controls">
-						<textarea id="code" placeholder="Embed html code." class="span12"></textarea>
+						<textarea id="code" placeholder="Embed html code." rows="5" class="span12"></textarea>
 					</div>
 				</div>
 			</section>
@@ -428,6 +429,77 @@ t120l64o2a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp
 $(document).ready(function(){
 	// make code pretty
 	window.prettyPrint && prettyPrint();
+	
+	var insts = {
+		'Lute':			{inst: 24,  max: 88, min: 16},	// 25.  Acoustic Guitar (nylon)
+		'Ukulele':		{inst: 28,  max: 88, min: 16},	// 29.  Electric Guitar (muted)
+		'Mandorin':		{inst: 105, max: 88, min: 16},	// 106. Banjo
+		'Whistle':		{inst: 72,  max: 88, min: 60},	// 73.  Piccolo
+		'Flute':		{inst: 73,  max: 83, min: 48},	// 74.  Flute
+		'Roncadora':	{inst: 77,  max: 83, min: 48},	// 78.  Shakuhachi
+		'Chalumeau':	{inst: 71,  max: 59, min: 24},	// 72.  Clarinet
+		'Tuba':			{inst: 58,  max: 59, min: 24},	// 59.  Tuba
+		'Lyre':			{inst: 46,  max: 88, min: 16},	// 47.  Orchestral Harp
+		'Snare':		{inst: 48,  max: 38, min: 38},	// 49.  Orchestra Kit (Concert SD)
+		'Drum':			{inst: 48,  max: 40, min: 40},	// 49.  Orchestra Kit (Concert SD)
+		'Bass Drum':	{inst: 48,  max: 35, min: 35},	// 49.  Orchestra Kit (Gran Casa)
+		'Cymbal':		{inst: 48,  max: 57, min: 57},	// 49.  Orchestra Kit (Hand Cymbal)
+		'Xylophone':	{inst: 15,  max: 88, min: 16}	// 14.  Xylophone
+	};
+
+	var noteTable = {'c':0,'d':2,'e':4,'f':5,'g':7,'a':9,'b':11};
+	var noteRevTable = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+	// MML音域チェック
+	// original scripts: http://mabimml.modev.jp/
+	function mabimml_tonecheck() {
+		var note_max = 0;
+		var note_min = 119;
+		var offset = 12;
+		var mml = $('#mml').val();
+
+		for(var partid = 0; partid < mml.length; partid++) {
+			var cOctave = 4;	
+			var mml_notes = mml[partid].match(/[abcdefgnoABCDEFGNO<>][\+\#-]?[0-9]*/g);
+			if (mml_notes == null) { continue; }
+			for(var mnid=0; mnid < mml_notes.length; mnid++) {
+				var mml_note = mml_notes[mnid];
+				if(mml_note.match(/[oO](0|[1-9][0-9]*)/)) {
+					// オクターブ命令を抽出
+					cOctave = parseInt(RegExp.$1);
+				} else if(mml_note.match(/</)) {
+					// 簡易オクターブ命令を抽出
+					cOctave = cOctave-1;
+				} else if(mml_note.match(/>/)) {
+					cOctave = cOctave+1;
+				} else if(mml_note.match(/[nN](0|[1-9][0-9]*)/)) {
+					// ノート指定だった場合、その値が音階の値になる
+					var note = parseInt(RegExp.$1);
+					note_max = (note_max < note)? note: note_max;
+					note_min = (note_min > note)? note: note_min;
+				} else if(mml_note.match(/([abcdefgABCDEFG])([\+\#-]?)/)) {
+					// 通常のノート指定。+と-で音階が変化するため。
+					var note = 12*cOctave + noteTable[RegExp.$1.toLowerCase()];
+					if(RegExp.$2 == '+' || RegExp.$2 == '#') {
+						note += 1;
+					} else if(RegExp.$2 == '-') {
+						note -= 1;
+					}
+					note_max = (note_max < note)? note: note_max;
+					note_min = (note_min > note)? note: note_min;
+				}
+			}
+		}
+		var $inst = $('#inst');
+		var inst_max = parseInt(insts[$inst.val()].max);
+		var inst_min = parseInt(insts[$inst.val()].min);
+		if (inst_max == inst_min){
+			$inst.parent().parent().addClass('warning');
+		}else if (note_max > inst_max || note_min < inst_min){
+			$inst.parent().parent().addClass('error');
+		}else{
+			$inst.parent().parent().removeClass('error').removeClass('warning');
+		}
+	}
 
 	// fix sub nav on scroll
 	var $win = $(window)
@@ -453,64 +525,113 @@ $(document).ready(function(){
 			$nav.removeClass('subnav-fixed')
 		}
 	}
-	
+	for( var i in insts){
+		$('#inst').append(jQuery('<option value="'+i+'">'+i+'</option>'));
+	}
+	$('#pan').change(function(){
+		var value = $(this).val();
+		var $bar = $('#bar_pan');
+		$('#bar_pan div').css({'width':Math.ceil((value / 127)*100)+'%'});
+		$bar.removeClass('progress-info')
+			.removeClass('progress-danger')
+			.removeClass('progress-success');
+		if (value == 64){
+			$bar.addClass('progress-success');
+		}else if (value < 64){
+			$bar.addClass('progress-info');
+		}else if (value > 64){
+			$bar.addClass('progress-danger');
+		}
+	});
+	$('#effect').change(function(){
+		var value = $(this).val();
+		var $bar = $('#bar_effect');
+		$('#bar_effect div').css({'width':Math.ceil((value / 127)*100)+'%'});
+	});
 	$('.mml').change(function(){
 		var $this = $(this);
-		try{
-			var str = $this.val();
+		var ranks = [
+			[ "P", 200, 100, 0 ],
+			[ "F", 400, 200, 100 ],
+			[ "E", 500, 200, 100 ],
+			[ "D", 600, 250, 150 ],
+			[ "C", 650, 250, 200 ],
+			[ "B", 700, 300, 200 ],
+			[ "A", 750, 300, 200 ],
+			[ "9", 800, 350, 200 ],
+			[ "8", 850, 400, 200 ],
+			[ "7", 900, 400, 200 ],
+			[ "6", 950, 450, 200 ],
+			[ "5", 1000, 500, 250 ],
+			[ "4", 1050, 550, 300 ],
+			[ "3", 1100, 600, 350 ],
+			[ "2", 1150, 700, 400 ],
+			[ "1", 1200, 800, 500 ]
+		];
+		var str = $this.val();
 			str = str.replace(/\r\n|\n\r|\n|\r|\s|/g, '');
-			var mml = str.match(/MML\@([0-9A-GLNORTV#<>.&+-]*?),([0-9A-GLNORTV#<>.&+-]*?),([0-9A-GLNORTV#<>.&+-]*?);/i);
-			$this.val(mml[0]);
-			var ranks = [
-				[ "P", 200, 100, 0 ],
-				[ "F", 400, 200, 100 ],
-				[ "E", 500, 200, 100 ],
-				[ "D", 600, 250, 150 ],
-				[ "C", 650, 250, 200 ],
-				[ "B", 700, 300, 200 ],
-				[ "A", 750, 300, 200 ],
-				[ "9", 800, 350, 200 ],
-				[ "8", 850, 400, 200 ],
-				[ "7", 900, 400, 200 ],
-				[ "6", 950, 450, 200 ],
-				[ "5", 1000, 500, 250 ],
-				[ "4", 1050, 550, 300 ],
-				[ "3", 1100, 600, 350 ],
-				[ "2", 1150, 700, 400 ],
-				[ "1", 1200, 800, 500 ]
-			];
+		try{
+			var buffer = str.match(/MML\@([0-9A-GLNORTV#<>.&+-]*),([0-9A-GLNORTV#<>.&+-]*),([0-9A-GLNORTV#<>.&+-]*);/i);
+			$this.val(buffer.shift());
 			for( var i = 0; i < ranks.length; i++ ){
 				var r = ranks[i];
-				if( r[1] >= mml[1].length && r[2] >= mml[2].length && r[3] >= mml[3].length ){
-					$('#rank').html('<span class="label">Rank: '+r[0]+'</span> <span class="label label-info">Melody: '+mml[0].length + ' / Chord1: '+mml[1].length+' / Chord2: '+mml[2].length+'</span>');
+				if( r[1] >= buffer[0].length && r[2] >= buffer[1].length && r[3] >= buffer[2].length ){
+					$('#rank').html('<span class="label">Rank: '+r[0]+'</span> <span class="label label-info">Melody: '+buffer[0].length + ' / Chord 1: '+buffer[1].length+' / Chord 2: '+buffer[2].length+'</span>');
 					break;
 				}
 			}
 			$this.parent().parent().removeClass('error');
 		}catch(e){
-			$this.parent().parent().removeClass('error');
+			console.error(e);
+			$this.parent().parent().addClass('error');
 		}
+		mabimml_tonecheck();
 	});
+	
+	$('#inst').change(function(){
+		mabimml_tonecheck();
+	});
+	
+	function htmlEsc(str){
+		str = str.replace(/&/g, '&amp;');
+		str = str.replace(/"/g, '&quot;');	//"
+		str = str.replace(/</g, '&lt;');
+		return str.replace(/>/g, '&gt;');
+	}
 	
 	$('#execute').click(function(){
 		var mml = $('#mml').val();
 		mml = mml.replace(/\r\n|\n\r|\n|\r|\s|/g, '');	// Remove line break and space
 		try{
-			var ret = mml.match(/MML\@([0-9A-GLNORTV#<>.&+-]*?),([0-9A-GLNORTV#<>.&+-]*?),([0-9A-GLNORTV#<>.&+-]*?);/i);
-			var str = ret[0].replace(/&/g, '&amp;');
-			str = str.replace(/"/g, '&quot;');	//"
-			str = str.replace(/</g, '&lt;');
-			str = str.replace(/>/g, '&gt;');
+			var ret = mml.match(/MML\@([0-9A-GLNORTV#<>.&+-]*),([0-9A-GLNORTV#<>.&+-]*),([0-9A-GLNORTV#<>.&+-]*);/i);
 
 			$('#mml').parent().parent().removeClass('error');
 			var template = [
-				'<pre class="mabimml" data-inst="'+$('#inst').val()+'" data-pan="'+$('#pan').val()+ '" data-effect="'+$('#effect').val()+'" data-group="'+$('#group').val()+'">',
-				str,
-				'</pre>'
-			].join('');
+				'<pre class="mabimml" data-inst-name="'+$('#inst').val()+'" data-pan="'+$('#pan').val()+ '" data-effect="'+$('#effect').val()+'" data-group="'+$('#group').val()+'">MML@',
+				htmlEsc(ret[1])+',',
+				htmlEsc(ret[2])+',',
+				htmlEsc(ret[3]),
+				';</pre>'
+			].join("\n");
 			$('#code').val(template);
 		}catch(e){
-			console.error(e);
+			$('#mml').parent().parent().addClass('error');
+		}
+	});
+	
+	$('#pukiwiki').click(function(){
+		var mml = $('#mml').val();
+		mml = mml.replace(/\r\n|\n\r|\n|\r|\s|/g, '');	// Remove line break and space
+		try{
+			var ret = mml.match(/MML\@([0-9A-GLNORTV#<>.&+-]*),([0-9A-GLNORTV#<>.&+-]*),([0-9A-GLNORTV#<>.&+-]*);/i);
+			$('#mml').parent().parent().removeClass('error');
+			var template = [
+				'#mabimml(,'+$('#inst').val()+','+$('#pan').val()+ ','+$('#effect').val()+','+$('#group').val()+'){{',
+				ret[0],
+				'}}'
+			].join("\n");
+			$('#code').val(template);
+		}catch(e){
 			$('#mml').parent().parent().addClass('error');
 		}
 	});
