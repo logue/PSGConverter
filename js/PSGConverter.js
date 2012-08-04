@@ -684,7 +684,6 @@
 			// キャッシュされたMML合奏用プレイヤーの作成
 			for (var group in ensemble_params) {
 				$('body').append(mml_player(mabimml_genmidi(ensemble_params[group]),group));
-				var obj = $('object[data-group='+group+']')[0];
 				$('.mml-player[data-group='+group+']').each(function(){
 					var $this = $('.mml-copy',this);
 					$this.after(
@@ -693,35 +692,47 @@
 						'<button class="mml-ensumble-pause btn btn-mini btn-danger" style="display:none;">'+message('e_pause')+ '</button>'
 					);
 				});
-				var $play = $('*[data-group='+group+'] .mml-ensumble-play');
-				var $stop = $('*[data-group='+group+'] .mml-ensumble-pause');
-				var $rewind = $('*[data-group='+group+'] .mml-ensumble-rewind');
-
-				$rewind.click(function(){
-					obj.Rewind();
+				$('.mml-ensumble-rewind').click(function(){
+					var group = $(this).parent().data().group;
+					$('object[data-group='+group+']')[0].Rewind();
 				});
-				$play.click(function(){
-					obj.Play();
-					$play.css({'display':'none'});
-					$stop.css({'display':'inline-block'});
+				$('.mml-ensumble-play').click(function(){
+					var group = $(this).parent().data().group;
+					$('object[data-group='+$(this).parent().data().group+']')[0].Play();
+					$('*[data-group='+group+'] .mml-ensumble-play').css({'display':'none'});
+					$('*[data-group='+group+'] .mml-ensumble-pause').css({'display':'inline-block'});
 				});
-				$stop.click(function(){
-					obj.Stop();
-					$stop.css({'display':'none'});
-					$play.css({'display':'inline-block'});
+				$('.mml-ensumble-pause').click(function(){
+					var group = $(this).parent().data().group;
+					$('object[data-group='+$(this).parent().data().group+']')[0].Stop();
+					$('*[data-group='+group+'] .mml-ensumble-pause').css({'display':'none'});
+					$('*[data-group='+group+'] .mml-ensumble-play').css({'display':'inline-block'});
 				});
 			}
 		}
 
 		if (location.protocol !== 'file:'){
-			$.getScript('http://logue.github.com/PSGConverter/js/ZeroClipboard/ZeroClipboard.js',function(){
-				ZeroClipboard.setMoviePath('http://logue.github.com/PSGConverter/js/ZeroClipboard/ZeroClipboard.swf');
+			var ZeroClipboardPath = 'http://logue.github.com/PSGConverter/js/ZeroClipboard/';
+			$.getScript(ZeroClipboardPath + 'ZeroClipboard.min.js',function(){
+				ZeroClipboard.setMoviePath(ZeroClipboardPath + 'ZeroClipboard.swf');
 				$('.mml-copy').each(function(){
-					var $this = $(this);
-					$this.css({'display':'inline-block'});
+					//Create a new clipboard client
 					var clip = new ZeroClipboard.Client();
-					clip.setText($this.attr('data-str'));
-					clip.glue($this.attr('id'));
+					clip.setHandCursor( true );
+					//Glue the clipboard client to the last td in each row
+					clip.glue(this);
+					var self = this;
+					
+					clip.addEventListener('onMouseDown', function(e){
+						//clip.reposition(this);
+						//if (confirm("Copy MML to clipboard MML.\nAre you sure?")){
+							clip.setText($(self).attr('data-str'));
+						//}
+					});
+					//Add a complete event to let the user know the text was copied
+					clip.addEventListener('complete', function(client, text) {
+						alert("Copied text to clipboard:\n" + text);
+					});
 				});
 			});
 		}
