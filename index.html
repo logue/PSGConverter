@@ -242,7 +242,7 @@ body {
 					</div>
 				</div>
 			</section>
-			
+
 			<section id="example">
 				<div class="page-header">
 					<h1>Example</h1>
@@ -301,7 +301,7 @@ t120l64o2c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp
 t120l64o2a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;av0l2ar1.v15a4a.r1a4a1a1a4aaa1aaaraaaraaaraaaraaaraaaraaaraal1ar.r.r2arar4aa4a2a2a,
 ,
 ;&lt;/pre&gt;</pre>
-			
+
 					</div>
 					<div  class="tab-pane" id="e-sample">
 						<div class="row">
@@ -343,21 +343,21 @@ t120l64o2a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp
 					</div>
 				</div>
 			</section>
-			
+
 			<section id="builder">
-				
+
 				<div class="page-header">
 					<h1>Builder</h1>
 				</div>
 				<h2>Input</h2>
 				<div class="row">
-					
+
 					<div class="span6">
 						<div class="form-horizontal">
 							<div class="control-group">
 								<label class="control-label" for="inst">Instrument</label>
 								<div class="controls">
-									<select id="inst" class="span3">
+									<select id="inst" class="mabimml-insts">
 									</select>
 									<p class="help-block">If there is a scale can not be played back, the color will change.</p>
 								</div>
@@ -397,7 +397,7 @@ t120l64o2a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp
 								<p class="help-block" id="rank"></p>
 							</div>
 						</div>
-						
+
 						<div class="form-actions">
 							<button id="execute" class="btn btn-primary">Generate HTML embed code</button>
 							<button id="pukiwiki" class="btn">Generate PukiWiki code</button>
@@ -412,7 +412,7 @@ t120l64o2a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp
 					</div>
 				</div>
 			</section>
-				
+
 			<footer class="footer">
 				<p class="pull-right"><a href="#">Back to top</a></p>
 				<p>&copy; 2007-2012 by <a href="http://logue.be/">Logue</a></p>
@@ -429,7 +429,7 @@ t120l64o2a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp
 $(document).ready(function(){
 	// make code pretty
 	window.prettyPrint && prettyPrint();
-	
+
 	var insts = {
 		'Lute':			{inst: 24,  max: 88, min: 16},	// 25.  Acoustic Guitar (nylon)
 		'Ukulele':		{inst: 28,  max: 88, min: 16},	// 29.  Electric Guitar (muted)
@@ -458,7 +458,7 @@ $(document).ready(function(){
 		var mml = $('#mml').val();
 
 		for(var partid = 0; partid < mml.length; partid++) {
-			var cOctave = 4;	
+			var cOctave = 4;
 			var mml_notes = mml[partid].match(/[abcdefgnoABCDEFGNO<>][\+\#-]?[0-9]*/g);
 			if (mml_notes == null) { continue; }
 			for(var mnid=0; mnid < mml_notes.length; mnid++) {
@@ -525,9 +525,6 @@ $(document).ready(function(){
 			$nav.removeClass('subnav-fixed')
 		}
 	}
-	for( var i in insts){
-		$('#inst').append(jQuery('<option value="'+i+'">'+i+'</option>'));
-	}
 	$('#pan').change(function(){
 		var value = $(this).val();
 		var $bar = $('#bar_pan');
@@ -587,24 +584,23 @@ $(document).ready(function(){
 		}
 		mabimml_tonecheck();
 	});
-	
+
 	$('#inst').change(function(){
 		mabimml_tonecheck();
 	});
-	
+
 	function htmlEsc(str){
 		str = str.replace(/&/g, '&amp;');
 		str = str.replace(/"/g, '&quot;');	//"
 		str = str.replace(/</g, '&lt;');
 		return str.replace(/>/g, '&gt;');
 	}
-	
+
 	$('#execute').click(function(){
 		var mml = $('#mml').val();
 		mml = mml.replace(/\r\n|\n\r|\n|\r|\s|/g, '');	// Remove line break and space
 		try{
 			var ret = mml.match(/MML\@([0-9A-GLNORTV#<>.&+-]*),([0-9A-GLNORTV#<>.&+-]*),([0-9A-GLNORTV#<>.&+-]*);/i);
-
 			$('#mml').parent().parent().removeClass('error');
 			var template = [
 				'<pre class="mabimml" data-inst-name="'+$('#inst').val()+'" data-pan="'+$('#pan').val()+ '" data-effect="'+$('#effect').val()+'" data-group="'+$('#group').val()+'">MML@',
@@ -618,7 +614,7 @@ $(document).ready(function(){
 			$('#mml').parent().parent().addClass('error');
 		}
 	});
-	
+
 	$('#pukiwiki').click(function(){
 		var mml = $('#mml').val();
 		mml = mml.replace(/\r\n|\n\r|\n|\r|\s|/g, '');	// Remove line break and space

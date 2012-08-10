@@ -54,6 +54,8 @@
 			'e_rewind'	: 'Rewind (Ensemble)',
 			'e_play'	: 'Play (Ensemble)',
 			'e_pause'	: 'Pause (Ensemble)',
+			'export'	: 'Export',
+			'msg_copied': 'Copied MML to clipboard.',
 			
 			'Lute'		: 'Lute',
 			'Ukulele'	: 'Ukulele', 
@@ -151,19 +153,9 @@
 	var NOTE_TABLE = {'c':0,'d':2,'e':4,'f':5,'g':7,'a':9,'b':11};
 
 	var GM_RESET = String.fromCharCode(
-		0x7E, 0x7F, 0x09, 0x01, 0xF7	// GM Reset F0 7E 7F 09 01 F7
+		0xF0, 0x05, 0x7E, 0x7F, 0x09, 0x01, 0xF7	// GM Reset F0 7E 7F 09 01 F7
 	);
-	
-	// 楽器セレクタ
-	function inst_selecteor(selected_inst){
-		var html = '<select class="inst" style="width:100px;">';
-		for (var name in insts) {
-			html += '<option value="'+insts[name].inst+'" '+((selected_inst == insts[name].inst) ? 'selected' : '')+'>'+name+'</option>';
-		}
-		html += '</select>'
-		return html;
-	}
-	
+
 	// ランクを取得
 	function mml_rank( mml ) {
 		var ranks = [
@@ -195,33 +187,9 @@
 		}
 		return "-";
 	}
-	// マスタートラック
-	function genMasterTrack(){
-		var part_msgs = [
-			{'time' : 0, 'msg' : String.fromCharCode(0xF0) + GM_RESET + String.fromCharCode(0xF7) },
-			{'time' : 96, 'msg' : String.fromCharCode(0xff,0x51, 0x07, 0xa1, 0x20)},	// テンポ設定（デフォルト60000000/120 = 500000）
-			{'time' : 368 , 'msg' : String.fromCharCode(0xff , 0x2f, 0x00)}	// Meta TrkEnd
-		];
-		var track_data = '';
-		var last_time;
-		for(var mmid = 0; mmid < part_msgs.length; mmid++) {
-			var dt = part_msgs[mmid].time - last_time;
-			last_time = part_msgs[mmid].time;
-			track_data += mml_writeVarLen(dt) + part_msgs[mmid].msg;
-		}
-		
-		var ret = 
-			TRACK_START +	// MTrk
-			mml_getBytes(track_data.length,4) +// Block Length
-			track_data 							// Midi data
-			TRACK_END;		// Trk End
-		;
-		return ret;
-	}
-	
-	
+
 	// トラックごとの処理
-	function genTrack(mml, chid, inst, pan, effect, Min, Max){
+	function genTrack(mml, chid, inst, pan, effect, Min, Max, track, trackName, isMelodyTrack){
 		var isDrum = (Min == Max) ? true : false;
 		var cLength = dLength;
 		var cOctave = 4;
@@ -230,16 +198,26 @@
 		var tieEnabled = false; 	// "&"記号処理用
 		var time = Semibreve;		// 先頭を１小節あける。（ノイズがでるため）
 		var isDrum = false;
+
 		if (Min == Max){
 			chid = 9;
 			isDrum = true;
 		}
+		var part_msgs = [];
+		if (track == 0){
+			part_msgs.push({'time' : 0,		'msg' : String.fromCharCode(0xff, 0x58, 0x04, 0x04, 0x02, 0x18, 0x08) })	// TimeSig 4/4 24 8
+			part_msgs.push({'time' : 0,		'msg' : String.fromCharCode(0xff, 0x51, 0x03) + mml_getBytes(500000,3) })	// Tempo 120
+			part_msgs.push({'time' : 0,		'msg' : String.fromCharCode(0xff, 0x54, 0x05, dLength, 0x00, 0x00, 0x00, 0x00) });	// SMPTE 96 0 0 0 0
+			part_msgs.push({'time' : 0,	 	'msg' : GM_RESET });	// GMリセット
+		}
+		part_msgs.push({'time' : 0,		'msg' : String.fromCharCode(0xff, 0x03, trackName.length) +trackName });
 		
-		var part_msgs = [
-			{'time' : 96,	'msg' : String.fromCharCode(0xc0 + chid, inst)},	// PrCh 楽器変更
-			{'time' : 192,	'msg' : String.fromCharCode(0xb0 + chid, 10, pan)},		// パンポット
-			{'time' : 288,	'msg' : String.fromCharCode(0xb0 + chid, 91, effect)}	// エフェクト
-		];
+		// QuickTimeはトラックごとに同じチャンネルでも別のチャンネルとして扱われるらしい。
+		//if (isMelodyTrack){
+			part_msgs.push({'time' : 96,	'msg' : String.fromCharCode(0xc0 + chid, inst)});	// PrCh 楽器変更
+			part_msgs.push({'time' : 192,	'msg' : String.fromCharCode(0xb0 + chid, 10, pan)});		// パンポット
+			part_msgs.push({'time' : 288,	'msg' : String.fromCharCode(0xb0 + chid, 91, effect)});	// エフェクト
+		//}
 
 		var notes = mml.match(/[A-GLNORTV<>][\+\#-]?[0-9]*\.?&?/ig);
 
@@ -337,7 +315,7 @@
 				// c&dなど無効なタイの処理
 				if(tieEnabled == true && note != cNote) {
 					tieEnabled=false;
-					part_msgs.push({'time':time,'msg':String.fromCharCode(0x80+chid,cNote,Minim)});	// NoteOff
+					part_msgs.push({'time':time,'msg':String.fromCharCode(0x80+chid,cNote,8*cVolume)});	// NoteOff
 				}
 
 				// 前回タイ記号が無いときのみノートオン
@@ -352,11 +330,11 @@
 					cNote=note; // 直前の音階を保存
 				} else {
 					tieEnabled=false;
-					part_msgs.push({'time':time,'msg':String.fromCharCode(0x80+chid,note,Minim)});	// NoteOff
+					part_msgs.push({'time':time,'msg':String.fromCharCode(0x80+chid,note,8*cVolume)});	// NoteOff
 				}
 			}else if(tieEnabled == true) {	// 無効なタイの処理
 				tieEnabled = false;
-				part_msgs.push({'time':time,'msg':String.fromCharCode(0x80+chid,cNote,Minim)});	// NoteOff
+				part_msgs.push({'time':time,'msg':String.fromCharCode(0x80+chid,cNote,8*cVolume)});	// NoteOff
 			}
 			
 			// 休符設定 R[n][.] (n=1～64)
@@ -389,11 +367,10 @@
 
 	// MML>MIDI変換コアルーチン
 	function mabimml_genmidi(param) {
+		console.log(param);
 		var nMin = 16, nMax = 88;
-		var tracks = 0;
+		var track = 0;
 		var ret ='';
-		// Master Track
-		//ret += genMasterTrack();
 		
 		// 直下にmmlパラメータが存在するかで、単一楽器用かどうかを判定する
 		if (param.mml){
@@ -404,18 +381,17 @@
 			var inst = (param.inst && param.inst >= 0 && param.inst < 128) ? Math.round(param.inst) : 0;
 			var pan = (param.pan && param.pan >= 0 && param.pan < 128) ? Math.round(param.pan) : 64;
 			var effect = (param.effect && param.effect >= 0 && param.effect < 128) ? Math.round(param.effect) : 40;
-			
 			if (nMin == nMax){
 				// ドラムの場合、メロディ→和音１→和音２という順にMMLが再生される。
 				var d_mml = '';
 				for(var part = 0; part < param.mml.length; part++) {	// パートごとに処理
 					d_mml += param.mml[part];
 				}
-				ret += genTrack(d_mml, part, inst, pan, effect, nMin, nMax);
+				ret += genTrack(d_mml, 9, inst, pan, effect, nMin, nMax, track, param.inst_name, true);
 			}else{
 				for(var part = 0; part < param.mml.length; part++) {	// パートごとに処理
-					ret += genTrack(param.mml[part], part, inst, pan, effect, nMin, nMax);
-					tracks++;
+					ret += genTrack(param.mml[part], 0, inst, pan, effect, nMin, nMax, track, param.inst_name, ((part==0)? true: false));
+					track++;
 				}
 			}
 		}else if (typeof(param) === 'object'){
@@ -429,18 +405,17 @@
 				var inst = (p.inst && p.inst >= 0 && p.inst < 128) ? Math.round(p.inst) : 0;
 				var pan = (p.pan && p.pan >= 0 && p.pan < 128) ? Math.round(p.pan) : 64;
 				var effect = (p.effect && p.effect >= 0 && p.effect < 128) ? Math.round(p.effect) : 40;
-				
 				if (nMin == nMax){
 					// ドラムの場合、メロディ→和音１→和音２という順にMMLが再生される。
 					var d_mml = '';
 					for(var part = 0; part < p.mml.length; part++) {	// パートごとに処理
 						d_mml += p.mml[part];
 					}
-					ret += genTrack(d_mml, part, inst, pan, effect, nMin, nMax);
+					ret += genTrack(d_mml, 9, inst, pan, effect, nMin, nMax, track, p.inst_name , true);
 				}else{
 					for(var part = 0; part < p.mml.length; part++) {
-						ret += genTrack(p.mml[part], i, inst, pan, effect, nMin, nMax);
-						tracks++;
+						ret += genTrack(p.mml[part], i, inst, pan, effect, nMin, nMax, track, p.inst_name,((part==0)? true: false));
+						track++;
 					}
 				}
 			}
@@ -450,8 +425,8 @@
 			String.fromCharCode(
 				0x4D, 0x54, 0x68, 0x64,		// chunk ID "MThd"
 				0x00, 0x00, 0x00, 0x06,		// chunk size
-				0x01, 0x00,					// format type (Midi format1)
-				0x00, tracks,				// number of tracks
+				0x00, 0x01,					// format type (Midi format1)
+				0x00, track,				// number of tracks
 				0x00, dLength				// ticks per beat
 			) + ret
 		);
@@ -575,7 +550,6 @@
 		}
 	}
 
-
 	$(document).ready(function(){
 		var count = 0;
 		var ensemble_params = {};
@@ -625,6 +599,7 @@
 				param.effect = data.effect ? data.effect : 40;
 				param.mml    = mml;
 				param.id     = count;
+				param.debug =true;
 				
 				var mml_url = (!isMSIE) ? mabimml_genmidi(param) : 
 					'http://comp.mabinogi.jp/PSGConverter.exe? /i'+param.inst+ ' ' + encodeURIComponent(param.mml[0]+','+param.mml[1]+','+param.mml[2]);
@@ -638,11 +613,11 @@
 							'<legend>'+$this.attr('title')+' <span class="label">'+mml_rank(mml)+'</span>  <span class="label label-info">'+message('Inst')+ ': '+message(param.inst_name)+'</span></legend>' :
 							'<span class="label">'+mml_rank(mml)+'</span>  <span class="label label-info">'+message('Inst')+ ': '+ message(param.inst_name) + '</span>'
 						),
-						(param.debug ? '<legend class="mml-debug btn btn-small btn-warning" href="'+url+'">debug.mid</a>' : ''),
+						(param.debug ? '<a class="mml-debug btn btn-mini btn-warning" href="'+mml_url+'">debug.mid</a>' : ''),
 						'<button class="mml-rewind btn btn-mini">'+message('rewind')+ '</button>',
 						'<button class="mml-play btn btn-mini btn-primary">'+message('play')+ '</button>',
 						'<button class="mml-pause btn btn-mini btn-danger" style="display:none;">'+message('pause')+ '</button>',
-						'<button class="mml-copy btn btn-mini btn-info" id="__mmlcopy'+param.id+'" data-str="'+('MML@'+param.mml[0]+','+param.mml[1]+','+param.mml[2]+';')+'">'+message('copy')+ '</button>',
+						'<button class="mml-copy btn btn-mini btn-info" data-str="'+('MML@'+param.mml[0]+','+param.mml[1]+','+param.mml[2]+';')+'">'+message('copy')+ '</button>',
 						mml_player(mml_url),
 					'</'+tag+'>'
 				].join("\n"));
@@ -680,13 +655,22 @@
 			count++;
 		});
 		
+		$('.mabimml-insts').each(function(){
+			for (var name in insts) {
+				$(this).append('<option value="'+name+'">'+message(name)+'</option>');
+			}
+		});
+		
 		if (!isMSIE){
 			// キャッシュされたMML合奏用プレイヤーの作成
 			for (var group in ensemble_params) {
-				$('body').append(mml_player(mabimml_genmidi(ensemble_params[group]),group));
+				var mml_url = mabimml_genmidi(ensemble_params[group]);
+				$('body').append(mml_player(mml_url,group));
 				$('.mml-player[data-group='+group+']').each(function(){
-					var $this = $('.mml-copy',this);
+					var debug = true;
+					var $this = $('.mml-pause',this);
 					$this.after(
+						(debug ? '<a class="mml-ensumble-debug btn btn-mini btn-inverse" href="'+mml_url+'">debug.mid</a>' : ''),
 						'<button class="mml-ensumble-rewind btn btn-mini">'+message('e_rewind')+ '</button>' +
 						'<button class="mml-ensumble-play btn btn-mini btn-success">'+message('e_play')+ '</button>' +
 						'<button class="mml-ensumble-pause btn btn-mini btn-danger" style="display:none;">'+message('e_pause')+ '</button>'
@@ -731,10 +715,16 @@
 					});
 					//Add a complete event to let the user know the text was copied
 					clip.addEventListener('complete', function(client, text) {
-						alert("Copied text to clipboard:\n" + text);
+						alert(message('msg_copied'));
 					});
 				});
 			});
 		}
+	});
+	
+	$(window).unload(function(){
+		$('object').each(function(){
+			$(this).Stop();
+		});
 	});
 } )(jQuery, this, this.document );
