@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8">
+		<title>PSGConverter</title>
+		<meta http-equiv="X-UA-Compatible" content="chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="Mabinogi MML Web Player for JavaScript.">
+		<meta name="author" content="Logue">
+
+		<!-- Le styles -->
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<style type="text/css">/*<![CDATA[*/
+body {
+	padding-top: 60px;
+	padding-bottom: 40px;
+}
+/*]]>*/</style>
+		<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+		<link href="js/google-code-prettify/prettify.css" rel="stylesheet">
+		<link href="css/composer.css" rel="stylesheet">
+
+		<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+	</head>
+
+	<body data-spy="scroll" data-target=".subnav" data-offset="200">
+
+		<div class="navbar navbar-fixed-top">
+			<div class="navbar-inner">
+				<div class="container">
+					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</a>
+					<h1><a class="brand" href="#">PSGConverter</a></h1>
+					<div class="nav-collapse">
+						<ul class="nav">
+							<li><a href="http://mabiassist.logue.be/PSGConverter">公式サイト</a></li>
+							<li><a href="http://forum.logue.be/index.php?topic=531.0">サポート掲示板</a></li>
+							<li class="dropdown active">
+								<a class="dropdown-toggle" data-toggle="dropdown" href="#">GitHubのページ</a>
+								<ul class="dropdown-menu">
+									<li><a href="https://github.com/logue/PSGConverter">プロジェクトページ</a></li>
+									<li><a href="https://github.com/logue/PSGConverter/network">ネットワーク</a></li>
+									<li><a href="https://github.com/logue/PSGConverter/pulls">プルリクエスト</a></li>
+									<li><a href="https://github.com/logue/PSGConverter/issues">問題報告</a></li>
+									<li><a href="https://github.com/logue/PSGConverter/graphs">グラフ</a></li>
+									<li><a href="https://github.com/logue/PSGConverter/downloads">ダウンロード</a></li>
+								</ul>
+							</li>
+							<li><a href="demo.html">デモ</a></li>
+							<li><a href="composer.html">作曲ツール</a></li>
+							<li><a href="http://logue.be/%E3%83%9E%E3%83%93%E3%83%8E%E3%82%AE/MML">作者のMMLのサイト</a></li>
+						</ul>
+					</div><!--/.nav-collapse -->
+				</div>
+			</div>
+		</div>
+
+		<div class="container">
+			<div class="hero-unit">
+				<h1>PSGConverter.js</h1>
+				<p class="lead">PSGConverterとは、マビノギのMMLをMIDIに変換するプログラムです。このページの実装は、JavaScriptのみによるものです。
+				すべて、クライアントサイドで実現している（MIDIファイルをホストしていない）ため、法律に違反せずMMLを公開することができます。</p>
+				<p>
+					<a href="http://mabiassist.logue.be/PSGConverter" class="btn btn-large btn-info">公式サイト</a>
+					<a href="http://forum.logue.be/index.php?topic=531.0" class="btn btn-large">サポート掲示板</a>
+					<a href="https://github.com/logue/PSGConverter" class="btn btn-large">プロジェクトサイト</a>
+					<a href="./demo.html" class="btn btn-large">デモ</a>
+					<a href="https://github.com/logue/PSGConverter/downloads" class="btn btn-primary btn-large">ダウンロード</a>
+				</p>
+			</div>
+			<header class="jumbotron subhead" id="overview">
+				<div class="subnav">
+					<ul class="nav nav-pills">
+						<li><a href="#overview">概要</a></li>
+						<li><a href="#usage">使用方法</a></li>
+						<li><a href="#example">例</a></li>
+						<li><a href="#builder">ビルダー</a></li>
+					</ul>
+				</div>
+			</header>
+			<section id="usage">
+				<div class="page-header">
+					<h1>使用方法</h1>
+				</div>
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="#install" data-toggle="tab">インストール</a></li>
+					<li><a href="#option" data-toggle="tab">オプション</a></li>
+					<li><a href="#instrument" data-toggle="tab">楽器</a></li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="install">
+						<p>このプログラムは、再生に<a href="http://www.apple.com/quicktime/">QuickTime</a>を使用します。マビノギのMMLを<code>pre</code>タグに入れ、クラス属性を<code>mabimml</code>にしてください。
+						<pre class="prettyprint">&lt;pre&nbsp;class=&quot;mabimml&quot;&nbsp;title=&quot;MML Name&quot;&nbsp;data-inst=&quot;105&quot;&gt; ... Insert valied Mabinogi MML ... &lt;/pre&gt;</pre>
+						次にページの<strong>フッター部分に</strong>以下のスクリプトを挿入してください。<a href="http://jquery.com/">jQuery</a>は必要に応じてで構いません。</p>
+						<pre class="prettyprint">
+&lt;script&nbsp;type=&quot;text/javascript&quot;&nbsp;src=&quot;http://code.jquery.com/jquery.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&nbsp;type=&quot;text/javascript&quot;&nbsp;src=&quot;./PSGConverter.js&quot;&gt;&lt;/script&gt;</pre>
+						<p>また、サイト利用者がIE遣いが多い場合は、ヘッダーの<code>meta</code>タグに、以下の行を挿入するようお願いします。</p>
+						<pre class="prettyprint">&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;chrome=1&quot;&gt;</pre>
+						<p class="alert alert-info">IEではdataスキームを正常に処理できないため、<a href="http://www.google.com/chromeframe">Chrome Frame</a>を用いた実装になります。</p>
+					</div>
+					<div class="tab-pane" id="option">
+						<table class="table">
+							<thead>
+								<tr>
+									<th>属性</th>
+									<th>説明</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td><code>title</code></td>
+									<td>MMLの名前です。</td>
+								</tr>
+								<tr>
+									<td><code>data-inst</code></td>
+									<td>GM楽器を指定する場合その番号を入力してください。</td>
+								</tr>
+								<tr>
+									<td><code>data-inst-name</code></td>
+									<td>マビノギの楽器名を英語で入力してください。例：Lute　詳細は<a href="#instrument">楽器</a>タブにて。</td>
+								</tr>
+								<tr>
+									<td><code>data-pan</code></td>
+									<td>音の定位を指定できます。デフォルトは64（中央）です。</td>
+								</tr>
+								<tr>
+									<td><code>data-effect</code></td>
+									<td>リバーブエフェクトの量。デフォルトは40です。</td>
+								</tr>
+								<tr>
+									<td><code>data-group</code></td>
+									<td>合奏用MMLの場合、ここの値を揃えておくと合奏ボタンが表示されます。</td>
+							</tbody>
+						</table>
+					</div>
+					<div class="tab-pane" id="instrument">
+						<p><code>data-inst-name</code>に入力されたGM楽器は以下の様な指定になっています。</p>
+						<table class="table">
+							<thead>
+								<tr>
+									<th>名前</th>
+									<th>GM音源のマッピングth>
+									<th>最高音階</th>
+									<th>最低音階</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Lute</td>
+									<td>25. Acoustic Guitar (nylon)</td>
+									<td>88</td>
+									<td>16</td>
+								</tr>
+								<tr>
+									<td>Ukulele</td>
+									<td>29. Electric Guitar (muted)</td>
+									<td>88</td>
+									<td>16</td>
+								</tr>
+								<tr>
+									<td>Mandorin</td>
+									<td>106. Banjo</td>
+									<td>88</td>
+									<td>16</td>
+								</tr>
+								<tr>
+									<td>Whistle</td>
+									<td>79. Whistle</td>
+									<td>88</td>
+									<td>60</td>
+								</tr>
+								<tr>
+									<td>Flute</td>
+									<td>74. Flute</td>
+									<td>83</td>
+									<td>48</td>
+								</tr>
+								<tr>
+									<td>Roncadora</td>
+									<td>78. Shakuhachi</td>
+									<td>83</td>
+									<td>48</td>
+								</tr>
+								<tr>
+									<td>Chalumeau</td>
+									<td>72. Clarinet</td>
+									<td>59</td>
+									<td>24</td>
+								</tr>
+								<tr>
+									<td>Tuba</td>
+									<td>59. Tuba</td>
+									<td>59</td>
+									<td>24</td>
+								</tr>
+								<tr>
+									<td>Lyre</td>
+									<td>47. Orchestral Harp</td>
+									<td>88</td>
+									<td>16</td>
+								</tr>
+								<tr>
+									<td>Snare</td>
+									<td>49, Orchestra Kit (Concert SD)</td>
+									<td>38</td>
+									<td>38</td>
+								</tr>
+								<tr>
+									<td>Drum</td>
+									<td>49, Orchestra Kit (Concert SD)</td>
+									<td>40</td>
+									<td>40</td>
+								</tr>
+								<tr>
+									<td>Bass Drum</td>
+									<td>49, Orchestra Kit (Concert SD)</td>
+									<td>35</td>
+									<td>35</td>
+								</tr>
+								<tr>
+									<td>Cymbal</td>
+									<td>49, Orchestra Kit (Hand Cymbal)</td>
+									<td>57</td>
+									<td>57</td>
+								</tr>
+								<tr>
+									<td>Xylophone</td>
+									<td>14. Xylophone</td>
+									<td>88</td>
+									<td>16</td>
+								</tr>
+							</tbody>
+						</table>
+						<p class="alert alert-info">音階の限界値を超えるとマビノギと同じように再生されます。</p>
+					</div>
+				</div>
+			</section>
+
+			<section id="example">
+				<div class="page-header">
+					<h1>例</h1>
+				</div
+				<p>注意：これらのサンプルは、ZeroClipboardの仕様の問題でクリップボードへコピーする機能が動作しません。</p>
+				<h2>基本「Tim2／レミングス」</h2>
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="#source" data-toggle="tab">HTMLソース</a></li>
+					<li><a href="#sample" data-toggle="tab">サンプル</a></li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="source">
+						<pre class="prettyprint">&lt;pre&nbsp;class=&quot;mabimml&quot;&nbsp;title=&quot;Tim2&quot;&nbsp;data-inst-name=&quot;Lute&quot;&gt;MML@
+l64e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;ev0e2t124v15l16eegeeegeeeaagad2l8r&gt;cc&lt;agl16ggeag8efggeag8fed4.r8&gt;e8e8dc&lt;agt124eegeeegeeeaagad2l8r&gt;cc&lt;agl16ggeag8efggeag8fed4.r8&gt;e8e8dc&lt;agl8fgagb+bfg4gfgfedc4.r4ggabggabb+bagfgagb+bfg4gfgfedc4.r4ggabggabb+bagr4&gt;eeedc&lt;b4gged4efo2cr&gt;cro6cc&lt;ag4&lt;gggb+4b&gt;c2&amp;cl16gag8gag4l8&lt;ddef4edc1&lt;g1,
+r1v15l8o2cr&gt;cr&lt;frag4gagagab+cr&gt;cr&lt;frag4gagagab+cr&gt;cr&lt;frag4gagagab+cr&gt;cr&lt;frag4gagagab+fffeff+ff+gggggabrfffefeff+gggggfedfffefeff+gggggabrfffefeff+gggggfedcr&gt;cr&lt;frag4gagaga&gt;cr2&lt;frag4r1r4.l16o4gag8gag4,
+l1.rrrrrrv15&lt;f2l4.ag1c8a2b+g1r8f2ag1c8a2&gt;cl1dr8erel8ro2gagagab+cr&gt;cr&lt;frag4gagagab+cr&gt;cr&lt;frag4gagagfe
+;&lt;/pre&gt;</pre>
+					</div>
+					<div class="tab-pane" id="sample">
+						<pre class="mabimml" title="Tim2" data-inst-name="Lute">MML@
+l64e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;ev0e2t124v15l16eegeeegeeeaagad2l8r&gt;cc&lt;agl16ggeag8efggeag8fed4.r8&gt;e8e8dc&lt;agt124eegeeegeeeaagad2l8r&gt;cc&lt;agl16ggeag8efggeag8fed4.r8&gt;e8e8dc&lt;agl8fgagb+bfg4gfgfedc4.r4ggabggabb+bagfgagb+bfg4gfgfedc4.r4ggabggabb+bagr4&gt;eeedc&lt;b4gged4efo2cr&gt;cro6cc&lt;ag4&lt;gggb+4b&gt;c2&amp;cl16gag8gag4l8&lt;ddef4edc1&lt;g1,
+r1v15l8o2cr&gt;cr&lt;frag4gagagab+cr&gt;cr&lt;frag4gagagab+cr&gt;cr&lt;frag4gagagab+cr&gt;cr&lt;frag4gagagab+fffeff+ff+gggggabrfffefeff+gggggfedfffefeff+gggggabrfffefeff+gggggfedcr&gt;cr&lt;frag4gagaga&gt;cr2&lt;frag4r1r4.l16o4gag8gag4,
+l1.rrrrrrv15&lt;f2l4.ag1c8a2b+g1r8f2ag1c8a2&gt;cl1dr8erel8ro2gagagab+cr&gt;cr&lt;frag4gagagab+cr&gt;cr&lt;frag4gagagfe
+;</pre>
+					</div>
+				</div>
+
+				<h2>合奏の例「ルーファウス歓迎式典／ファイナルファンタジー７」</h2>
+				<p>このプログラムは合奏のエミュレーションにも対応しています。</p>
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="#e-source" data-toggle="tab">HTMLソース</a></li>
+					<li><a href="#e-sample" data-toggle="tab">サンプル</a></li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="e-source">
+						<pre class="prettyprint">
+&lt;pre&nbsp;class=&quot;mabimml&quot;&nbsp;title=&quot;Rufus&nbsp;Welcoming&nbsp;Ceremony&nbsp;（シャルモー）&quot;&nbsp;data-inst-name=&quot;Chalumeau&quot;&nbsp;data-pan=&quot;32&quot;&nbsp;data-group=&quot;1&quot;&gt;MML@
+t120l64&lt;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;ev0e2v15e4.l16eeerfrf+rgrg+r8.er2r8.g+4.g+g+g+rarbr&gt;c+rdr8.&lt;br4.rl12eg+b&gt;d4d8.l16c+dr&lt;br4r&gt;d4d8.c+dr&lt;br4r&gt;e4.eee4.eee2.e8.dc+4c+8.c-c+rdrc+r&lt;bra2r8ar&gt;c+rerf+4d8.c+c-4f+4e2&amp;e8r8c+rerf+4d8.c+c-4g+4e2c+4erarg+4g+8.f+g+rarg+rf+re2.l12e&amp;edc+4c+8.l16c-c+rdrc+r&lt;bra2r8ar&gt;c+rerf+4d8.c+c-4f+4e2&amp;e8r8c+rerf+4d8.c+c-4g+4e2c+rc+r&lt;br&gt;c+rdrc-4drc+r&lt;a4&gt;c+r&lt;b2ar1.r2.r8.a4a8.g+arg+rf+rg+rer8.c+8.dc+r&lt;brarg+ro4c+4c+8.c+c+r&lt;g+rar&gt;c+r&lt;br8.er4.rl12eg+b&gt;d4d8.l16c+dr&lt;br4r&gt;d4d8.c+dr&lt;br4r&gt;e4.eee4.eee2.,
+r1.r8v15l16&lt;d+rdrc+rcr8.&lt;g+r1r4r&gt;grf+rfrer8.&lt;br2r8.b4&gt;c8.cc+rc+r4rd4c+8.c+&lt;brbr4r&gt;e4.ee&lt;a4.aa&gt;e2.r4a4a8.ag+rg+rarg+re2r8erarg+ra4a4g+4b4a2&amp;a8r8arg+ra4a4g+4&gt;e4c+2&lt;a4&gt;c+rerc+4c+4crcrcrcrc+2&lt;b8r8l12g+&amp;g+g+a4a8.l16ag+rg+rarg+re2r8erarg+ra4a4g+4b4a2&amp;a8r8arg+ra4a4g+4&gt;e4c+2&lt;ararg+rarbrf+4brare4are2er1.r2.r8.f+4f+8.ff+r8.arbrg+r8.g+r2r8.a4a8.aarbr&gt;c+rdrer8.&lt;g+r2r8.e4f8.ff+rf+r4rg4f8.ferer4rb4.bb&gt;c4.cc&lt;b2.,
+l1.rrrrr1v15&lt;b4.l16bb&gt;c4.cc&lt;b2.l4r&lt;aeebaeaedaebaeaedaebaeaec+g+d+g+c+g+ebaeebaeaedaebaeaedaebaef+ec-f+aeb2l16ar1.r1.r4.ro4c+r8.&lt;br2r8.&lt;a4e4c+8e8a8bal4g+f+edeff+.r8gfe.r8&gt;e.l16ee&lt;b4.bb&gt;e2.
+;&lt;/pre&gt;
+&lt;pre&nbsp;class=&quot;mabimml&quot;&nbsp;title=&quot;Rufus&nbsp;Welcoming&nbsp;Ceremony&nbsp;（フルート）&quot;&nbsp;data-inst-name=&quot;Flute&quot;&nbsp;data-pan=&quot;96&quot;&nbsp;data-group=&quot;1&quot;&gt;MML@
+t120l64e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;ev0e2v15e4.l16eeerfrf+rgrg+r8.er2r8.g+4.g+g+g+rarbr&gt;c+rdr8.&lt;br4.rl12eg+b&gt;d4d8.l16c+dr&lt;br4r&gt;d4d8.c+dr&lt;br4r&gt;e4.eee4.eee2.r4arc+r&lt;ar&gt;c+rarc+r&lt;g+r&gt;c+rarc+r&lt;ar&gt;c+rarc+r&lt;ar&gt;c+rf+rf+r&lt;ar&gt;f+rf+rf+r&lt;ar&gt;f+rerc+r&lt;ar&gt;c+rar&lt;brg+rbr&gt;f+rf+rdrf+rg+rf+rdrf+rarerc+rerarc+rc+rc+rg+rerc+rerg+rcrcrcrl24g+f+g+f+g+f+g+f+g+f+g+f+g+f+g+f+g+f+g+f+g+f+g+f+l16arc+r&lt;ar&gt;c+rarc+r&lt;g+r&gt;c+rarc+r&lt;ar&gt;c+rarc+r&lt;ar&gt;c+rf+rf+r&lt;ar&gt;f+rf+rf+r&lt;ar&gt;f+rerer&lt;ar&gt;erar&lt;brg+rbr&gt;f+rf+r&lt;ar&gt;f+rg+rf+r&lt;g+r&gt;f+rarc+r&lt;ar&gt;c+rarc+r&lt;g+r&gt;c+rf+rf+r&lt;br&gt;f+rf+rer&lt;ar&gt;erl24g+f+g+f+g+f+g+f+g+f+g+f+l8ar1.r2.r&lt;a4a.l16aarg+rf+rg+rer8.c+r2r8.&gt;c+4c+8.c+c+r&lt;brar&gt;c+r&lt;br8.g+r4.rl12eg+b&gt;d4d8.l16c+dr&lt;br4r&gt;d4d8.c+dr&lt;br4r&gt;e4.eee4.eee2.,
+r1.r8v15l16d+rdrc+rcr8.c+r1r4rgrf+rfrer8.g+r2r8.e4f8.ff+rf+r4rg4f+8.f+erer4r&gt;d4.ddc4.cc&lt;b2.r4&gt;ererc+rerererc+rerererc+rerererc+rerardrdrdrg+rdrdrdrarerc+rererer&lt;br&gt;erardr&lt;ar&gt;drerdr&lt;g+r&gt;drerc+r&lt;ar&gt;c+rf+rer&lt;ar&gt;ererc+r&lt;g+r&gt;c+rd+rd+r&lt;g+r&gt;d+rl24eaeaeaeaeaeaeaeaeaeaeaeal16ererc+rerererc+rerererc+rerererc+rerardrdrdrg+rdrdrdrarc+rc+rc+rerer&lt;br&gt;erardrdrdrerdrdrdrererc+rerf+rerc+rerbrdrdrdrarc+rc+rc+,
+l1.rrrrrrrrrrrrrrrrv15l24&gt;eaeaeaeaeaeal8er1.r2.r&lt;f+4f+.l16f+f+rerdrerc+r2.r8.a4a8.aarg+rf+rarg+r8.er2r8.e4f8.ff+rf+r4rg4f8.ferer4r&gt;d4.ddc4.cc&lt;b2.
+;&lt;/pre&gt;
+&lt;pre&nbsp;class=&quot;mabimml&quot;&nbsp;title=&quot;Rufus&nbsp;Welcoming&nbsp;Ceremony&nbsp;（小太鼓）&quot;&nbsp;data-inst-name=&quot;Drum&quot;&nbsp;data-pan=&quot;48&quot;&nbsp;data-group=&quot;1&quot;&gt;MML@
+t120l64o2d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;dv0d2v15l32ddddddddd8d16d16d8d8d8d8d4d4r2ddddddddd8d16d16d8d8d8d8d4d4r2d4ddddddddd8d8r4d4ddddddddd8d8r4ddddddddddddddddddddddddddddddddddddddddddddddddd2d8d8l16ddddd8d8ddddd8d8ddddd8d8l32ddddddddd8d8l16ddddd8d8ddddd8d8ddddd8d8l32ddddddddd8d8l16ddddd8d8ddddd8d8ddddd8d8l32ddddddddd8d8l16ddddd8d8ddddd8d8ddddd8d8l32ddddddddd8d8l16ddddd8d8ddddd8d8ddddd8d8l32ddddddddd8d8l16ddddd8d8ddddd8d8ddddd8d8l32ddddddddd8d8l16ddddd8d8ddddd8d8ddddd8d8l32ddddddddd8d8l16ddddd8d8ddddl32ddddddddddddddddd2d8d4.d8d4.ddddddddddddddddd8d4.r1.r1.r1d4ddddddddd8d4.d4ddddddddd8d4.ddddddddddddd16d16ddddddddddddd16d16ddddddddddddddddd2,
+,
+;&lt;/pre&gt;
+&lt;pre&nbsp;class=&quot;mabimml&quot;&nbsp;title=&quot;Rufus&nbsp;Welcoming&nbsp;Ceremony&nbsp;（大太鼓）&quot;&nbsp;data-inst-name=&quot;Bass&nbsp;Drum&quot;&nbsp;data-pan=&quot;64&quot;&nbsp;data-group=&quot;1&quot;&gt;MML@
+t120l64o2c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;cv0c2r1.v15l4cc2.r1cc1c1cc2c2c1ccccccc2ccccccc2ccccccc2ccccccc2ccccccc2ccccccc2ccccccc2ccccc1c8c.c8c.c2c8c.r1.cc2.r1cc1c1cc2c2c1,
+,
+;&lt;/pre&gt;
+&lt;pre&nbsp;class=&quot;mabimml&quot;&nbsp;title=&quot;Rufus&nbsp;Welcoming&nbsp;Ceremony&nbsp;（シンバル）&quot;&nbsp;data-inst-name=&quot;Cymbal&quot;&nbsp;data-pan=&quot;64&quot;&nbsp;data-group=&quot;1&quot;&gt;MML@
+t120l64o2a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;av0l2ar1.v15a4a.r1a4a1a1a4aaa1aaaraaaraaaraaaraaaraaaraaaraal1ar.r.r2arar4aa4a2a2a,
+,
+;&lt;/pre&gt;</pre>
+
+					</div>
+					<div  class="tab-pane" id="e-sample">
+						<div class="row">
+							<div class="span6">
+								<pre class="mabimml" title="ルーファウス歓迎式典（シャルモー）" data-inst-name="Chalumeau" data-pan="32" data-group="1">MML@
+t120l64&lt;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;ev0e2v15e4.l16eeerfrf+rgrg+r8.er2r8.g+4.g+g+g+rarbr&gt;c+rdr8.&lt;br4.rl12eg+b&gt;d4d8.l16c+dr&lt;br4r&gt;d4d8.c+dr&lt;br4r&gt;e4.eee4.eee2.e8.dc+4c+8.c-c+rdrc+r&lt;bra2r8ar&gt;c+rerf+4d8.c+c-4f+4e2&amp;e8r8c+rerf+4d8.c+c-4g+4e2c+4erarg+4g+8.f+g+rarg+rf+re2.l12e&amp;edc+4c+8.l16c-c+rdrc+r&lt;bra2r8ar&gt;c+rerf+4d8.c+c-4f+4e2&amp;e8r8c+rerf+4d8.c+c-4g+4e2c+rc+r&lt;br&gt;c+rdrc-4drc+r&lt;a4&gt;c+r&lt;b2ar1.r2.r8.a4a8.g+arg+rf+rg+rer8.c+8.dc+r&lt;brarg+ro4c+4c+8.c+c+r&lt;g+rar&gt;c+r&lt;br8.er4.rl12eg+b&gt;d4d8.l16c+dr&lt;br4r&gt;d4d8.c+dr&lt;br4r&gt;e4.eee4.eee2.,
+r1.r8v15l16&lt;d+rdrc+rcr8.&lt;g+r1r4r&gt;grf+rfrer8.&lt;br2r8.b4&gt;c8.cc+rc+r4rd4c+8.c+&lt;brbr4r&gt;e4.ee&lt;a4.aa&gt;e2.r4a4a8.ag+rg+rarg+re2r8erarg+ra4a4g+4b4a2&amp;a8r8arg+ra4a4g+4&gt;e4c+2&lt;a4&gt;c+rerc+4c+4crcrcrcrc+2&lt;b8r8l12g+&amp;g+g+a4a8.l16ag+rg+rarg+re2r8erarg+ra4a4g+4b4a2&amp;a8r8arg+ra4a4g+4&gt;e4c+2&lt;ararg+rarbrf+4brare4are2er1.r2.r8.f+4f+8.ff+r8.arbrg+r8.g+r2r8.a4a8.aarbr&gt;c+rdrer8.&lt;g+r2r8.e4f8.ff+rf+r4rg4f8.ferer4rb4.bb&gt;c4.cc&lt;b2.,
+l1.rrrrr1v15&lt;b4.l16bb&gt;c4.cc&lt;b2.l4r&lt;aeebaeaedaebaeaedaebaeaec+g+d+g+c+g+ebaeebaeaedaebaeaedaebaef+ec-f+aeb2l16ar1.r1.r4.ro4c+r8.&lt;br2r8.&lt;a4e4c+8e8a8bal4g+f+edeff+.r8gfe.r8&gt;e.l16ee&lt;b4.bb&gt;e2.
+;</pre>
+							</div>
+							<div class="span6">
+								<pre class="mabimml" title="ルーファウス歓迎式典（フルート）" data-inst-name="Flute" data-pan="96" data-group="1">MML@
+t120l64e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;e&amp;ev0e2v15e4.l16eeerfrf+rgrg+r8.er2r8.g+4.g+g+g+rarbr&gt;c+rdr8.&lt;br4.rl12eg+b&gt;d4d8.l16c+dr&lt;br4r&gt;d4d8.c+dr&lt;br4r&gt;e4.eee4.eee2.r4arc+r&lt;ar&gt;c+rarc+r&lt;g+r&gt;c+rarc+r&lt;ar&gt;c+rarc+r&lt;ar&gt;c+rf+rf+r&lt;ar&gt;f+rf+rf+r&lt;ar&gt;f+rerc+r&lt;ar&gt;c+rar&lt;brg+rbr&gt;f+rf+rdrf+rg+rf+rdrf+rarerc+rerarc+rc+rc+rg+rerc+rerg+rcrcrcrl24g+f+g+f+g+f+g+f+g+f+g+f+g+f+g+f+g+f+g+f+g+f+g+f+l16arc+r&lt;ar&gt;c+rarc+r&lt;g+r&gt;c+rarc+r&lt;ar&gt;c+rarc+r&lt;ar&gt;c+rf+rf+r&lt;ar&gt;f+rf+rf+r&lt;ar&gt;f+rerer&lt;ar&gt;erar&lt;brg+rbr&gt;f+rf+r&lt;ar&gt;f+rg+rf+r&lt;g+r&gt;f+rarc+r&lt;ar&gt;c+rarc+r&lt;g+r&gt;c+rf+rf+r&lt;br&gt;f+rf+rer&lt;ar&gt;erl24g+f+g+f+g+f+g+f+g+f+g+f+l8ar1.r2.r&lt;a4a.l16aarg+rf+rg+rer8.c+r2r8.&gt;c+4c+8.c+c+r&lt;brar&gt;c+r&lt;br8.g+r4.rl12eg+b&gt;d4d8.l16c+dr&lt;br4r&gt;d4d8.c+dr&lt;br4r&gt;e4.eee4.eee2.,
+r1.r8v15l16d+rdrc+rcr8.c+r1r4rgrf+rfrer8.g+r2r8.e4f8.ff+rf+r4rg4f+8.f+erer4r&gt;d4.ddc4.cc&lt;b2.r4&gt;ererc+rerererc+rerererc+rerererc+rerardrdrdrg+rdrdrdrarerc+rererer&lt;br&gt;erardr&lt;ar&gt;drerdr&lt;g+r&gt;drerc+r&lt;ar&gt;c+rf+rer&lt;ar&gt;ererc+r&lt;g+r&gt;c+rd+rd+r&lt;g+r&gt;d+rl24eaeaeaeaeaeaeaeaeaeaeaeal16ererc+rerererc+rerererc+rerererc+rerardrdrdrg+rdrdrdrarc+rc+rc+rerer&lt;br&gt;erardrdrdrerdrdrdrererc+rerf+rerc+rerbrdrdrdrarc+rc+rc+,
+l1.rrrrrrrrrrrrrrrrv15l24&gt;eaeaeaeaeaeal8er1.r2.r&lt;f+4f+.l16f+f+rerdrerc+r2.r8.a4a8.aarg+rf+rarg+r8.er2r8.e4f8.ff+rf+r4rg4f8.ferer4r&gt;d4.ddc4.cc&lt;b2.
+;</pre>
+							</div>
+						</div>
+						<div class="row">
+							<div class="span4">
+								<pre class="mabimml" title="ルーファウス歓迎式典（小太鼓）" data-inst-name="Drum" data-pan="48" data-group="1">MML@
+t120l64o2d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;d&amp;dv0d2v15l32ddddddddd8d16d16d8d8d8d8d4d4r2ddddddddd8d16d16d8d8d8d8d4d4r2d4ddddddddd8d8r4d4ddddddddd8d8r4ddddddddddddddddddddddddddddddddddddddddddddddddd2d8d8l16ddddd8d8ddddd8d8ddddd8d8l32ddddddddd8d8l16ddddd8d8ddddd8d8ddddd8d8l32ddddddddd8d8l16ddddd8d8ddddd8d8ddddd8d8l32ddddddddd8d8l16ddddd8d8ddddd8d8ddddd8d8l32ddddddddd8d8l16ddddd8d8ddddd8d8ddddd8d8l32ddddddddd8d8l16ddddd8d8ddddd8d8ddddd8d8l32ddddddddd8d8l16ddddd8d8ddddd8d8ddddd8d8l32ddddddddd8d8l16ddddd8d8ddddl32ddddddddddddddddd2d8d4.d8d4.ddddddddddddddddd8d4.r1.r1.r1d4ddddddddd8d4.d4ddddddddd8d4.ddddddddddddd16d16ddddddddddddd16d16ddddddddddddddddd2,
+,
+;</pre>
+							</div>
+							<div class="span4">
+								<pre class="mabimml" title="ルーファウス歓迎式典（大太鼓）" data-inst-name="Bass Drum" data-pan="64" data-group="1">MML@
+t120l64o2c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;c&amp;cv0c2r1.v15l4cc2.r1cc1c1cc2c2c1ccccccc2ccccccc2ccccccc2ccccccc2ccccccc2ccccccc2ccccccc2ccccc1c8c.c8c.c2c8c.r1.cc2.r1cc1c1cc2c2c1,
+,
+;</pre>
+							</div>
+							<div class="span4">
+								<pre class="mabimml" title="ルーファウス歓迎式典（シンバル）" data-inst-name="Cymbal" data-pan="80" data-group="1">MML@
+t120l64o2a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;a&amp;av0l2ar1.v15a4a.r1a4a1a1a4aaa1aaaraaaraaaraaaraaaraaaraaaraal1ar.r.r2arar4aa4a2a2a,
+,
+;</pre>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="builder">
+
+				<div class="page-header">
+					<h1>ビルダー</h1>
+				</div>
+				<h2>入力</h2>
+				<div class="row">
+
+					<div class="span6">
+						<div class="form-horizontal">
+							<div class="control-group">
+								<label class="control-label" for="inst">楽器</label>
+								<div class="controls">
+									<select id="inst" class="span3 mabimml-insts">
+									</select>
+									<p class="help-block">MMLに再生できない音階が含まれている場合、ここの色が変化します。</p>
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label" for="pan">パンポッド</label>
+								<div class="controls">
+									<input type="number" id="pan" placeholder="64" value="64" max="127" min="0" class="span2" />
+									<div class="progress progress-success" id="bar_pan"><div class="bar" style="width: 50%;"></div></div>
+									<p class="help-block"><span class="label label-info">左</span>が0で、<span class="label label-success">中央</span>は64、<span class="label label-important">右</span>は127になります。</p>
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label" for="effect">エフェクトの量</label>
+								<div class="controls">
+									<input type="number" id="effect" placeholder="40" value="40" max="127" min="0" class="span2" />
+									<div class="progress progress-warning" id="bar_effect"><div class="bar" style="width: 30%;"></div></div>
+									<p class="help-block">デフォルトは40です。</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="span6">
+						<div class="form-horizontal">
+							<div class="control-group">
+								<label class="control-label" for="effect">合奏グループ</label>
+								<div class="controls">
+									<input type="text" id="group" placeholder="0" value="0" class="span2" />
+									<p class="help-block">0は合奏になりません。</p>
+								</div>
+							</div>
+						</div>
+						<div class="control-group">
+							<label class="control-label" for="mml">MML</label>
+							<div class="controls">
+								<textarea id="mml" rows="3" style="width:98%;" placeholder="MML@....,....,...;" class="mml"></textarea>
+								<p class="help-block" id="rank"></p>
+							</div>
+						</div>
+
+						<div class="form-actions">
+							<button id="execute" class="btn btn-primary">HTMLコードを生成する</button>
+							<button id="pukiwiki" class="btn">PukiWiki貼付けコードを生成する</button>
+						</div>
+					</div>
+				</div>
+				<h2>Output</h2>
+				<div class="control-group">
+					<label class="control-label" for="code">出力コード</label>
+					<div class="controls">
+						<textarea id="code" placeholder="埋め込み用のHTMLがここに出力されます。" rows="5" class="span12"></textarea>
+					</div>
+				</div>
+			</section>
+
+			<footer class="footer">
+				<p class="pull-right"><a href="#">Back to top</a></p>
+				<p>&copy; 2007-2012 by <a href="http://logue.be/">Logue</a></p>
+			</footer>
+		</div> <!-- /container -->
+		<!-- Le javascript
+		================================================== -->
+		<!-- Placed at the end of the document so the pages load faster -->
+		<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="js/google-code-prettify/prettify.js"></script>
+		<script type="text/javascript" src="js/PSGConverter.js"></script>
+		<script type="text/javascript">/*<![CDATA[*/
+$(document).ready(function(){
+	// make code pretty
+	window.prettyPrint && prettyPrint();
+
+	var insts = {
+		'Lute':			{inst: 24,  max: 88, min: 16},	// 25.  Acoustic Guitar (nylon)
+		'Ukulele':		{inst: 28,  max: 88, min: 16},	// 29.  Electric Guitar (muted)
+		'Mandorin':		{inst: 105, max: 88, min: 16},	// 106. Banjo
+		'Whistle':		{inst: 72,  max: 88, min: 60},	// 73.  Piccolo
+		'Flute':		{inst: 73,  max: 83, min: 48},	// 74.  Flute
+		'Roncadora':	{inst: 77,  max: 83, min: 48},	// 78.  Shakuhachi
+		'Chalumeau':	{inst: 71,  max: 59, min: 24},	// 72.  Clarinet
+		'Tuba':			{inst: 58,  max: 59, min: 24},	// 59.  Tuba
+		'Lyre':			{inst: 46,  max: 88, min: 16},	// 47.  Orchestral Harp
+		'Snare':		{inst: 48,  max: 38, min: 38},	// 49.  Orchestra Kit (Concert SD)
+		'Drum':			{inst: 48,  max: 40, min: 40},	// 49.  Orchestra Kit (Concert SD)
+		'Bass Drum':	{inst: 48,  max: 35, min: 35},	// 49.  Orchestra Kit (Gran Casa)
+		'Cymbal':		{inst: 48,  max: 57, min: 57},	// 49.  Orchestra Kit (Hand Cymbal)
+		'Xylophone':	{inst: 15,  max: 88, min: 16}	// 14.  Xylophone
+	};
+
+	var noteTable = {'c':0,'d':2,'e':4,'f':5,'g':7,'a':9,'b':11};
+	var noteRevTable = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+	// MML音域チェック
+	// original scripts: http://mabimml.modev.jp/
+	function mabimml_tonecheck() {
+		var note_max = 0;
+		var note_min = 119;
+		var offset = 12;
+		var mml = $('#mml').val();
+
+		for(var partid = 0; partid < mml.length; partid++) {
+			var cOctave = 4;
+			var mml_notes = mml[partid].match(/[abcdefgnoABCDEFGNO<>][\+\#-]?[0-9]*/g);
+			if (mml_notes == null) { continue; }
+			for(var mnid=0; mnid < mml_notes.length; mnid++) {
+				var mml_note = mml_notes[mnid];
+				if(mml_note.match(/[oO](0|[1-9][0-9]*)/)) {
+					// オクターブ命令を抽出
+					cOctave = parseInt(RegExp.$1);
+				} else if(mml_note.match(/</)) {
+					// 簡易オクターブ命令を抽出
+					cOctave = cOctave-1;
+				} else if(mml_note.match(/>/)) {
+					cOctave = cOctave+1;
+				} else if(mml_note.match(/[nN](0|[1-9][0-9]*)/)) {
+					// ノート指定だった場合、その値が音階の値になる
+					var note = parseInt(RegExp.$1);
+					note_max = (note_max < note)? note: note_max;
+					note_min = (note_min > note)? note: note_min;
+				} else if(mml_note.match(/([abcdefgABCDEFG])([\+\#-]?)/)) {
+					// 通常のノート指定。+と-で音階が変化するため。
+					var note = 12*cOctave + noteTable[RegExp.$1.toLowerCase()];
+					if(RegExp.$2 == '+' || RegExp.$2 == '#') {
+						note += 1;
+					} else if(RegExp.$2 == '-') {
+						note -= 1;
+					}
+					note_max = (note_max < note)? note: note_max;
+					note_min = (note_min > note)? note: note_min;
+				}
+			}
+		}
+		var $inst = $('#inst');
+		var inst_max = parseInt(insts[$inst.val()].max);
+		var inst_min = parseInt(insts[$inst.val()].min);
+		if (inst_max == inst_min){
+			$inst.parent().parent().addClass('warning');
+		}else if (note_max > inst_max || note_min < inst_min){
+			$inst.parent().parent().addClass('error');
+		}else{
+			$inst.parent().parent().removeClass('error').removeClass('warning');
+		}
+	}
+
+	// fix sub nav on scroll
+	var $win = $(window)
+	, $nav = $('.subnav')
+	, navTop = $('.subnav').length && $('.subnav').offset().top - 40
+	, isFixed = 0
+	processScroll()
+
+	// hack sad times - holdover until rewrite for 2.1
+	$nav.on('click', function () {
+		if (!isFixed) setTimeout(function () {  $win.scrollTop($win.scrollTop() - 47) }, 10)
+	})
+
+	$win.on('scroll', processScroll)
+
+	function processScroll() {
+		var i, scrollTop = $win.scrollTop()
+		if (scrollTop >= navTop && !isFixed) {
+			isFixed = 1
+			$nav.addClass('subnav-fixed')
+		} else if (scrollTop <= navTop && isFixed) {
+			isFixed = 0
+			$nav.removeClass('subnav-fixed')
+		}
+	}
+	$('#pan').change(function(){
+		var value = $(this).val();
+		var $bar = $('#bar_pan');
+		$('#bar_pan div').css({'width':Math.ceil((value / 127)*100)+'%'});
+		$bar.removeClass('progress-info')
+			.removeClass('progress-danger')
+			.removeClass('progress-success');
+		if (value == 64){
+			$bar.addClass('progress-success');
+		}else if (value < 64){
+			$bar.addClass('progress-info');
+		}else if (value > 64){
+			$bar.addClass('progress-danger');
+		}
+	});
+	$('#effect').change(function(){
+		var value = $(this).val();
+		var $bar = $('#bar_effect');
+		$('#bar_effect div').css({'width':Math.ceil((value / 127)*100)+'%'});
+	});
+	$('.mml').change(function(){
+		var $this = $(this);
+		var ranks = [
+			[ "P", 200, 100, 0 ],
+			[ "F", 400, 200, 100 ],
+			[ "E", 500, 200, 100 ],
+			[ "D", 600, 250, 150 ],
+			[ "C", 650, 250, 200 ],
+			[ "B", 700, 300, 200 ],
+			[ "A", 750, 300, 200 ],
+			[ "9", 800, 350, 200 ],
+			[ "8", 850, 400, 200 ],
+			[ "7", 900, 400, 200 ],
+			[ "6", 950, 450, 200 ],
+			[ "5", 1000, 500, 250 ],
+			[ "4", 1050, 550, 300 ],
+			[ "3", 1100, 600, 350 ],
+			[ "2", 1150, 700, 400 ],
+			[ "1", 1200, 800, 500 ]
+		];
+		var str = $this.val();
+			str = str.replace(/\r\n|\n\r|\n|\r|\s|/g, '');
+		try{
+			var buffer = str.match(/MML\@([0-9A-GLNORTV#<>.&+-]*),([0-9A-GLNORTV#<>.&+-]*),([0-9A-GLNORTV#<>.&+-]*);/i);
+			$this.val(buffer.shift());
+			for( var i = 0; i < ranks.length; i++ ){
+				var r = ranks[i];
+				if( r[1] >= buffer[0].length && r[2] >= buffer[1].length && r[3] >= buffer[2].length ){
+					$('#rank').html('<span class="label">Rank: '+r[0]+'</span> <span class="label label-info">Melody: '+buffer[0].length + ' / Chord 1: '+buffer[1].length+' / Chord 2: '+buffer[2].length+'</span>');
+					break;
+				}
+			}
+			$this.parent().parent().removeClass('error');
+		}catch(e){
+			console.error(e);
+			$this.parent().parent().addClass('error');
+		}
+		mabimml_tonecheck();
+	});
+
+	$('#inst').change(function(){
+		mabimml_tonecheck();
+	});
+
+	function htmlEsc(str){
+		str = str.replace(/&/g, '&amp;');
+		str = str.replace(/"/g, '&quot;');	//"
+		str = str.replace(/</g, '&lt;');
+		return str.replace(/>/g, '&gt;');
+	}
+
+	$('#execute').click(function(){
+		var mml = $('#mml').val();
+		mml = mml.replace(/\r\n|\n\r|\n|\r|\s|/g, '');	// Remove line break and space
+		try{
+			var ret = mml.match(/MML\@([0-9A-GLNORTV#<>.&+-]*),([0-9A-GLNORTV#<>.&+-]*),([0-9A-GLNORTV#<>.&+-]*);/i);
+			$('#mml').parent().parent().removeClass('error');
+			var template = [
+				'<pre class="mabimml" data-inst-name="'+$('#inst').val()+'" data-pan="'+$('#pan').val()+ '" data-effect="'+$('#effect').val()+'" data-group="'+$('#group').val()+'">MML@',
+				htmlEsc(ret[1])+',',
+				htmlEsc(ret[2])+',',
+				htmlEsc(ret[3]),
+				';</pre>'
+			].join("\n");
+			$('#code').val(template);
+		}catch(e){
+			$('#mml').parent().parent().addClass('error');
+		}
+	});
+
+	$('#pukiwiki').click(function(){
+		var mml = $('#mml').val();
+		mml = mml.replace(/\r\n|\n\r|\n|\r|\s|/g, '');	// Remove line break and space
+		try{
+			var ret = mml.match(/MML\@([0-9A-GLNORTV#<>.&+-]*),([0-9A-GLNORTV#<>.&+-]*),([0-9A-GLNORTV#<>.&+-]*);/i);
+			$('#mml').parent().parent().removeClass('error');
+			var template = [
+				'#mabimml(,'+$('#inst').val()+','+$('#pan').val()+ ','+$('#effect').val()+','+$('#group').val()+'){{',
+				ret[0],
+				'}}'
+			].join("\n");
+			$('#code').val(template);
+		}catch(e){
+			$('#mml').parent().parent().addClass('error');
+		}
+	});
+
+	$.getScript(('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js',function(){
+		try {
+			var pageTracker = _gat._getTracker("UA-33600926-1");
+			pageTracker._trackPageview();
+		} catch(err) {}
+	});
+});
+/*]]>*/</script>
+	</body>
+</html>

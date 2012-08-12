@@ -1,6 +1,6 @@
 /*!
  * PSGConverter.js
- * v1.1.2
+ * v1.2
  * Copyright (c)2007-2012 Logue <http://logue.be/> All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,20 +23,20 @@
 	var locale = (navigator.userLanguage||navigator.browserLanguage||navigator.language).substr(0,2);
 
 	var insts = {
-		'Lute':			{inst: 24,  max: 88, min: 16},	// 25.  Acoustic Guitar (nylon)
-		'Ukulele':		{inst: 28,  max: 88, min: 16},	// 29.  Electric Guitar (muted)
-		'Mandorin':		{inst: 105, max: 88, min: 16},	// 106. Banjo
-		'Whistle':		{inst: 72,  max: 88, min: 60},	// 73.  Piccolo
-		'Flute':		{inst: 73,  max: 83, min: 48},	// 74.  Flute
-		'Roncadora':	{inst: 77,  max: 83, min: 48},	// 78.  Shakuhachi
-		'Chalumeau':	{inst: 71,  max: 59, min: 24},	// 72.  Clarinet
-		'Tuba':			{inst: 58,  max: 59, min: 24},	// 59.  Tuba
-		'Lyre':			{inst: 46,  max: 88, min: 16},	// 47.  Orchestral Harp
-		'Snare':		{inst: 48,  max: 38, min: 38},	// 49.  Orchestra Kit (Concert SD)
-		'Drum':			{inst: 48,  max: 40, min: 40},	// 49.  Orchestra Kit (Concert SD)
-		'Bass Drum':	{inst: 48,  max: 35, min: 35},	// 49.  Orchestra Kit (Gran Casa)
-		'Cymbal':		{inst: 48,  max: 57, min: 57},	// 49.  Orchestra Kit (Hand Cymbal)
-		'Xylophone':	{inst: 15,  max: 88, min: 16}	// 14.  Xylophone
+		'Lute':			{inst: 24,  max: 88, min: 16, mms: 0},	// 25.  Acoustic Guitar (nylon)
+		'Ukulele':		{inst: 28,  max: 88, min: 16, mms: 1},	// 29.  Electric Guitar (muted)
+		'Mandorin':		{inst: 105, max: 88, min: 16, mms: 2},	// 106. Banjo
+		'Whistle':		{inst: 72,  max: 88, min: 60, mms: 3},	// 73.  Piccolo
+		'Flute':		{inst: 73,  max: 83, min: 48, mms: 4},	// 74.  Flute
+		'Roncadora':	{inst: 77,  max: 83, min: 48, mms: 5},	// 78.  Shakuhachi
+		'Chalumeau':	{inst: 71,  max: 59, min: 24, mms: 6},	// 72.  Clarinet
+		'Tuba':			{inst: 58,  max: 59, min: 24, mms: 30},	// 59.  Tuba
+		'Lyre':			{inst: 46,  max: 88, min: 16, mms: 0},	// 47.  Orchestral Harp
+		'Snare':		{inst: 48,  max: 38, min: 38, mms: 0},	// 49.  Orchestra Kit (Concert SD)
+		'Drum':			{inst: 48,  max: 40, min: 40, mms: 20},	// 49.  Orchestra Kit (Concert SD)
+		'Bass Drum':	{inst: 48,  max: 35, min: 35, mms: 19},	// 49.  Orchestra Kit (Gran Casa)
+		'Cymbal':		{inst: 48,  max: 57, min: 57, mms: 21},	// 49.  Orchestra Kit (Hand Cymbal)
+		'Xylophone':	{inst: 15,  max: 88, min: 16, mms: 0}	// 14.  Xylophone
 	};
 	
 	var messages = {
@@ -86,6 +86,8 @@
 			'e_rewind'	: '巻き戻し（合奏）',
 			'e_play'	: '再生（合奏）',
 			'e_pause'	: '一時停止（合奏）',
+			'export'	: 'エクスポート',
+			'msg_copied': 'クリップボードにコピーしました。',
 			
 			'Lute'		: 'リュート',
 			'Ukulele'	: 'ウクレレ',
@@ -103,6 +105,22 @@
 			'Xylophone'	: 'シロフォン'
 		},
 		ko : {
+			'Rank'		: '순위',
+			'Inst'		: '악기',
+			'Melody'	: '멜로디',
+			'Chord1'	: '화음 1',
+			'Chord2'	: '화음 2',
+
+			'rewind'	: '되감기',
+			'play'		: '재생',
+			'pause'		: '일시 정지',
+			'copy'		: '복사',
+			'e_rewind'	: '되감기 (합주)',
+			'e_play'	: '재생 (합주)',
+			'e_pause'	: '일시 정지 (합주)',
+			'export'	: '내보내기',
+			'msg_copied': '클립 보드에 복사되었습니다.',
+
 			'Lute'		: '류트',
 			'Ukulele'	: '우쿨렐레',
 			'Mandorin'	: '만돌린',
@@ -111,14 +129,30 @@
 			'Roncadora'	: '론카도라',
 			'Chalumeau'	: '샬루모',
 			'Tuba'		: '피시스 튜바',
-			'Lyre'		: 'Lyre',
+			'Lyre'		: '거문고',
 			'Snare'		: '스네어 드럼',
 			'Drum'		: '작은 북',
 			'Bass Drum'	: '큰 북',
 			'Cymbal'	: '심벌즈',
-			'Xylophone'	: 'Xylophone'
+			'Xylophone'	: '목금'
 		},
 		zh : {
+			'Rank'		: '等级',
+			'Inst'		: '仪器',
+			'Melody'	: '旋律',
+			'Chord1'	: '和弦 1',
+			'Chord2'	: '和弦 2',
+			
+			'rewind'	: '回卷',
+			'play'		: '播放',
+			'pause'		: '暂停',
+			'copy'		: '复制',
+			'e_rewind'	: '回卷 (合奏)',
+			'e_play'	: '播放 (合奏)',
+			'e_pause'	: '暂停 (合奏)',
+			'export'	: '输出',
+			'msg_copied': '复制的MML到剪贴板。',
+			
 			'Lute'		: '鲁特琴',
 			'Ukulele'	: '夏威夷四弦琴',
 			'Mandorin'	: '曼陀林',
@@ -127,12 +161,12 @@
 			'Roncadora'	: '哆啦',
 			'Chalumeau'	: '单簧管',
 			'Tuba'		: '大號',
-			'Lyre'		: 'Lyre',
+			'Lyre'		: '七弦琴',
 			'Snare'		: '军鼓',
 			'Drum'		: '小鼓',
 			'Bass Drum'	: '低音鼓',
 			'Cymbal'	: '钹',
-			'Xylophone'	: 'Xylophone'
+			'Xylophone'	: '木琴'
 		}
 		
 	};
@@ -366,8 +400,7 @@
 	}
 
 	// MML>MIDI変換コアルーチン
-	function mabimml_genmidi(param) {
-		console.log(param);
+	function mabimml_mml2midi(param, isDataUri) {
 		var nMin = 16, nMax = 88;
 		var track = 0;
 		var ret ='';
@@ -421,15 +454,15 @@
 			}
 		}
 		// ヘッダーとともに内容を返す
-		return 'data:audio/midi;base64,'+base64encode(
+		var midi =  
 			String.fromCharCode(
 				0x4D, 0x54, 0x68, 0x64,		// chunk ID "MThd"
 				0x00, 0x00, 0x00, 0x06,		// chunk size
 				0x00, 0x01,					// format type (Midi format1)
 				0x00, track,				// number of tracks
 				0x00, dLength				// ticks per beat
-			) + ret
-		);
+			) + ret;
+		return (isDataUri) ? 'data:audio/midi;base64,'+base64encode(midi) : midi;
 	}
 
 	//// Utilities
@@ -599,9 +632,8 @@
 				param.effect = data.effect ? data.effect : 40;
 				param.mml    = mml;
 				param.id     = count;
-				param.debug =true;
 				
-				var mml_url = (!isMSIE) ? mabimml_genmidi(param) : 
+				var mml_url = (!isMSIE) ? mabimml_mml2midi(param, true) : 
 					'http://comp.mabinogi.jp/PSGConverter.exe? /i'+param.inst+ ' ' + encodeURIComponent(param.mml[0]+','+param.mml[1]+','+param.mml[2]);
 				
 				var tag = $this.attr('title') ? 'fieldset' : 'div';
@@ -618,6 +650,12 @@
 						'<button class="mml-play btn btn-mini btn-primary">'+message('play')+ '</button>',
 						'<button class="mml-pause btn btn-mini btn-danger" style="display:none;">'+message('pause')+ '</button>',
 						'<button class="mml-copy btn btn-mini btn-info" data-str="'+('MML@'+param.mml[0]+','+param.mml[1]+','+param.mml[2]+';')+'">'+message('copy')+ '</button>',
+			//			'<div class="btn-group ">',
+			//			'<button class="btn btn-mini dropdown-toggle" data-toggle="dropdown">'+message('export')+'<span class="caret"></span></button>',
+			//			'<ul class="dropdown-menu">',
+			//				'<li><a href="#" class="mml-midi">MIDI</a></li>',
+			//			'</ul>',
+			//			'</div>',
 						mml_player(mml_url),
 					'</'+tag+'>'
 				].join("\n"));
@@ -664,13 +702,12 @@
 		if (!isMSIE){
 			// キャッシュされたMML合奏用プレイヤーの作成
 			for (var group in ensemble_params) {
-				var mml_url = mabimml_genmidi(ensemble_params[group]);
+				var mml_url = mabimml_mml2midi(ensemble_params[group], true);
 				$('body').append(mml_player(mml_url,group));
 				$('.mml-player[data-group='+group+']').each(function(){
-					var debug = true;
 					var $this = $('.mml-pause',this);
 					$this.after(
-						(debug ? '<a class="mml-ensumble-debug btn btn-mini btn-inverse" href="'+mml_url+'">debug.mid</a>' : ''),
+						(ensemble_params.debug ? '<a class="mml-ensumble-debug btn btn-mini btn-inverse" href="'+mml_url+'">debug.mid</a>' : ''),
 						'<button class="mml-ensumble-rewind btn btn-mini">'+message('e_rewind')+ '</button>' +
 						'<button class="mml-ensumble-play btn btn-mini btn-success">'+message('e_play')+ '</button>' +
 						'<button class="mml-ensumble-pause btn btn-mini btn-danger" style="display:none;">'+message('e_pause')+ '</button>'
@@ -706,7 +743,6 @@
 					//Glue the clipboard client to the last td in each row
 					clip.glue(this);
 					var self = this;
-					
 					clip.addEventListener('onMouseDown', function(e){
 						//clip.reposition(this);
 						//if (confirm("Copy MML to clipboard MML.\nAre you sure?")){
@@ -724,7 +760,7 @@
 	
 	$(window).unload(function(){
 		$('object').each(function(){
-			$(this).Stop();
+			$(this)[0].Stop();
 		});
 	});
 } )(jQuery, this, this.document );
