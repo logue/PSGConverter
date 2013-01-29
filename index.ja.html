@@ -28,7 +28,7 @@ body {
 
 	<body data-spy="scroll" data-target=".subnav" data-offset="200">
 
-		<div class="navbar navbar-fixed-top">
+		<div class="navbar navbar-inverse navbar-fixed-top">
 			<div class="navbar-inner">
 				<div class="container">
 					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -36,7 +36,7 @@ body {
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</a>
-					<h1><a class="brand" href="#">PSGConverter</a></h1>
+					<a class="brand" href="#">PSGConverter</a>
 					<div class="nav-collapse">
 						<ul class="nav">
 							<li><a href="http://mabiassist.logue.be/PSGConverter">公式サイト</a></li>
@@ -100,7 +100,7 @@ body {
 						次にページの<strong>フッター部分に</strong>以下のスクリプトを挿入してください。<a href="http://jquery.com/">jQuery</a>は必要に応じてで構いません。</p>
 						<pre class="prettyprint">
 &lt;script&nbsp;type=&quot;text/javascript&quot;&nbsp;src=&quot;http://code.jquery.com/jquery.min.js&quot;&gt;&lt;/script&gt;
-&lt;script&nbsp;type=&quot;text/javascript&quot;&nbsp;src=&quot;./PSGConverter.js&quot;&gt;&lt;/script&gt;</pre>
+&lt;script&nbsp;type=&quot;text/javascript&quot;&nbsp;src=&quot;http://logue.github.com/PSGConverter/js/PSGConverter.min.js&quot;&gt;&lt;/script&gt;</pre>
 						<p>また、サイト利用者がIE遣いが多い場合は、ヘッダーの<code>meta</code>タグに、以下の行を挿入するようお願いします。</p>
 						<pre class="prettyprint">&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;chrome=1&quot;&gt;</pre>
 						<p class="alert alert-info">IEではdataスキームを正常に処理できないため、<a href="http://www.google.com/chromeframe">Chrome Frame</a>を用いた実装になります。</p>
@@ -233,6 +233,12 @@ body {
 								<tr>
 									<td>Xylophone</td>
 									<td>14. Xylophone</td>
+									<td>88</td>
+									<td>16</td>
+								</tr>
+								<tr>
+									<td>Electric Guitar</td>
+									<td>14. Electric Guitar (distortion)</td>
 									<td>88</td>
 									<td>16</td>
 								</tr>
@@ -444,7 +450,8 @@ $(document).ready(function(){
 		'Drum':			{inst: 48,  max: 40, min: 40},	// 49.  Orchestra Kit (Concert SD)
 		'Bass Drum':	{inst: 48,  max: 35, min: 35},	// 49.  Orchestra Kit (Gran Casa)
 		'Cymbal':		{inst: 48,  max: 57, min: 57},	// 49.  Orchestra Kit (Hand Cymbal)
-		'Xylophone':	{inst: 15,  max: 88, min: 16}	// 14.  Xylophone
+		'Xylophone':	{inst: 15,  max: 88, min: 16},	// 14.  Xylophone
+		'E.Guitar':		{inst: 21,  max: 88, min: 16}	// 22.  Electric Guitar
 	};
 
 	var noteTable = {'c':0,'d':2,'e':4,'f':5,'g':7,'a':9,'b':11};

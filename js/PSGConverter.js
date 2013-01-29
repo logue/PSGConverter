@@ -1,7 +1,7 @@
 /*!
  * PSGConverter.js
- * v1.2
- * Copyright (c)2007-2012 Logue <http://logue.be/> All rights reserved.
+ * v1.3
+ * Copyright (c)2007-2013 Logue <http://logue.be/> All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,8 @@
 		'Drum':			{inst: 48,  max: 40, min: 40, mms: 20},	// 49.  Orchestra Kit (Concert SD)
 		'Bass Drum':	{inst: 48,  max: 35, min: 35, mms: 19},	// 49.  Orchestra Kit (Gran Casa)
 		'Cymbal':		{inst: 48,  max: 57, min: 57, mms: 21},	// 49.  Orchestra Kit (Hand Cymbal)
-		'Xylophone':	{inst: 15,  max: 88, min: 16, mms: 0}	// 14.  Xylophone
+		'Xylophone':	{inst: 15,  max: 88, min: 16, mms: 0},	// 14.  Xylophone
+		'E.Guitar':		{inst: 30,  max: 88, min: 16, mms: 0}	// 31.  Electric Guitar (distortion)
 	};
 	
 	var messages = {
@@ -70,7 +71,8 @@
 			'Drum'		: 'Drum',
 			'Bass Drum'	: 'Bass Drum',
 			'Cymbal'	: 'Cymbal',
-			'Xylophone'	: 'Xylophone'
+			'Xylophone'	: 'Xylophone',
+			'E.Guitar'	: 'Electric Guitar'
 		},
 		ja : {
 			'Rank'		: 'ランク',
@@ -102,7 +104,8 @@
 			'Drum'		: '小太鼓',
 			'Bass Drum'	: '大太鼓',
 			'Cymbal'	: 'シンバル',
-			'Xylophone'	: 'シロフォン'
+			'Xylophone'	: 'シロフォン',
+			'E.Guiter'	: 'エレキギター'
 		},
 		ko : {
 			'Rank'		: '순위',
@@ -129,12 +132,13 @@
 			'Roncadora'	: '론카도라',
 			'Chalumeau'	: '샬루모',
 			'Tuba'		: '피시스 튜바',
-			'Lyre'		: '거문고',
+			'Lyre'		: '리라',
 			'Snare'		: '스네어 드럼',
 			'Drum'		: '작은 북',
 			'Bass Drum'	: '큰 북',
 			'Cymbal'	: '심벌즈',
-			'Xylophone'	: '목금'
+			'Xylophone'	: '실로폰',
+			'E.Guiter'	: '일렉트릭 기타'
 		},
 		zh : {
 			'Rank'		: '等级',
@@ -166,7 +170,8 @@
 			'Drum'		: '小鼓',
 			'Bass Drum'	: '低音鼓',
 			'Cymbal'	: '钹',
-			'Xylophone'	: '木琴'
+			'Xylophone'	: '木琴',
+			'E.Guiter'	: '电吉他'
 		}
 		
 	};
@@ -392,9 +397,9 @@
 		
 		var ret = 
 			TRACK_START +	// MTrk
-			mml_getBytes(track_data.length,4) +// Block Length
-			track_data 							// Midi data
-			TRACK_END;		// Trk End
+			mml_getBytes(track_data.length,4) +	// Block Length
+			track_data							// Midi data
+		//	TRACK_END		// Trk End
 		;
 		return ret;
 	}
@@ -667,16 +672,18 @@
 				var $stop = $self.children('.mml-pause');
 
 				$self.children('.mml-rewind',this).click(function(){
+					
 					obj.Rewind();
 				});
 				$play.click(function(){
+					console.log(obj);
 					obj.Play();
-					$(this).css({'display':'none'});
+					$play.css({'display':'none'});
 					$stop.css({'display':'inline-block'});
 				});
 				$stop.click(function(){
 					obj.Stop();
-					$(this).css({'display':'none'});
+					$stop.css({'display':'none'});
 					$play.css({'display':'inline-block'});
 				});
 				
