@@ -534,11 +534,11 @@
 		return [
 			'<object type="audio/midi" width="1" height="1"' +
 					( ensemble ? 'data-group="'+ensemble+'" ' : ''),
-					( isMSIE ? 'classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab"' : 'data="'+url+'"' ) + '>',
+					( isMSIE ? 'classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="//www.apple.com/qtactivex/qtplugin.cab"' : 'data="'+url+'"' ) + '>',
 				'<param name="controller" value="false" />',
 				'<param name="src" value="'+url+'" />',
 				'<param name="autoplay" value="false" />',
-				'<param name="pluginspage" value="http://www.apple.com/quicktime/download/" />',
+				'<param name="pluginspage" value="//www.apple.com/quicktime/download/" />',
 			'</object>'
 		].join("\n");
 	}
@@ -586,11 +586,11 @@
 	$(document).ready(function(){
 		var count = 0;
 		var ensemble_params = {};
-		$("head").append('<link rel="stylesheet" href="http://logue.github.com/PSGConverter/css/PSGConverter.min.css" />');
+		$("head").append('<link rel="stylesheet" href="//logue.github.com/PSGConverter/css/PSGConverter.min.css" />');
 
 		if (isMSIE){
 			// MSIEはChrome Frameで逃げる
-			$.getScript('http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js',function(){
+			$.getScript('//ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js',function(){
 				CFInstall.check({
 					mode: 'overlay'
 				});
@@ -634,7 +634,7 @@
 				param.id     = count;
 				
 				var mml_url = (!isMSIE) ? mabimml_mml2midi(param, true) : 
-					'http://comp.mabinogi.jp/PSGConverter.exe? /i'+param.inst+ ' ' + encodeURIComponent(param.mml[0]+','+param.mml[1]+','+param.mml[2]);
+					'//comp.mabinogi.jp/PSGConverter.exe? /i'+param.inst+ ' ' + encodeURIComponent(param.mml[0]+','+param.mml[1]+','+param.mml[2]);
 				
 				var tag = $this.attr('title') ? 'fieldset' : 'div';
 				
@@ -733,7 +733,7 @@
 		}
 
 		if (location.protocol !== 'file:'){
-			var ZeroClipboardPath = 'http://logue.github.com/PSGConverter/js/ZeroClipboard/';
+			var ZeroClipboardPath = 'https://cdnjs.cloudflare.com/ajax/libs/zeroclipboard/2.3.0/';
 			$.getScript(ZeroClipboardPath + 'ZeroClipboard.min.js',function(){
 				ZeroClipboard.setMoviePath(ZeroClipboardPath + 'ZeroClipboard.swf');
 				$('.mml-copy').each(function(){
